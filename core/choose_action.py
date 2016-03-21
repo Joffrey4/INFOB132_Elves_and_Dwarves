@@ -25,7 +25,10 @@ def choose_action(data_map):
     player = 'player' + str((data_map['main_turn'] % 2) + 1)
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
 
+
     print 'It is the turn of %s' % (data_map[str(player) + '_info'][1])
+    # AJOUTER IF POUR DEFINIR SI PLAYER OU IA JOUE.
+    # APPELE IA_ACTION
     game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
