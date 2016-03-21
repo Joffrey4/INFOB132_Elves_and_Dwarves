@@ -104,4 +104,3 @@ def event_display(player, player_name, event):
             time.sleep(0.2)
         time.sleep(4)
         clear_output()
-
