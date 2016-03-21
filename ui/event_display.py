@@ -5,7 +5,7 @@ from colorama import Fore, Back, Style
 
 
 def event_display(player, player_name, event):
-    """Display screen which representst the actualy situation with the name of the concerned player
+    """Print a line of the screen which representst the actualy situation with the name of the concerned player
     Parameters:
     -----------
     player: tells if player 1 or player 2 concerned player (str)
