@@ -3,6 +3,21 @@ from colorama import Fore, Back, Style
 
 
 def create_data_ui(data_map):
+    """Generate the whole user's interface with the statistics.
+
+    Parameters:
+    -----------
+    data_map: the whole database (dict)
+
+    Returns:
+    --------
+    data_ui: the user's interface to print (list)
+
+    Versions:
+    ---------
+    specification: Laurent Emilie v.1 (15/03/16)
+    implementation: Bienvenu Joffrey v.3 (23/03/16)
+    """
     data_ui = [[]] * (17 + data_map['map_size'])
 
     # Initialisation of the displaying constants.
