@@ -1,7 +1,6 @@
 # -*- coding: ascii -*-
 
 
-
 def choose_action(data_map):
     """Ask and execute the instruction given by the players to move or attack units.
 
@@ -16,6 +15,7 @@ def choose_action(data_map):
     Notes:
     -----
     Instructions must be in one line, with format xx_xx -a-> xx_xx for an attack and xx_xx -m-> xx_xx for a movement.
+    Each instruction must be spaced by 3 characters.
 
     Version:
     -------
