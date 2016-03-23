@@ -1,7 +1,6 @@
 # -*- coding: ascii -*-
 
 
-
 def choose_action(data_map):
     """Ask and execute the instruction given by the players to move or attack units.
 
@@ -16,6 +15,7 @@ def choose_action(data_map):
     Notes:
     -----
     Instructions must be in one line, with format xx_xx -a-> xx_xx for an attack and xx_xx -m-> xx_xx for a movement.
+    Each instruction must be spaced by 3 characters.
 
     Version:
     -------
@@ -29,10 +29,9 @@ def choose_action(data_map):
 
     print 'It is the turn of %s' % (data_map[str(player) + '_info'][1])
 
-    # AJOUTER IF POUR DEFINIR SI PLAYER OU IA JOUE.
+    # Tells whether IA or player's turn.
     if data_map[str(player+'_info')][1] == 'IA':
         game_instruction = ia_action(player, data_map)
-    # APPELE IA_ACTION
     else:
         game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
@@ -50,4 +49,4 @@ def choose_action(data_map):
 
     data_map['main_turn'] += 1
 
-    display_map(data_map, map_size)
+    return data_map

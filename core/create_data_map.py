@@ -1,9 +1,10 @@
 # -*- coding: ascii -*-
 from colorama import Fore
+import random
 
 
 def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
-    """ Create a dictionary that the game will use as database.
+    """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
     ----------
@@ -21,10 +22,9 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
 
     Version:
     -------
-    specification: Maroit Jonathan & Bienvenu Joffrey (v.1.1 04/03/16)
-    implementation: Maroit Jonathan & Bienvenu Joffrey (v.4 22/03/16)
+    specification: Maroit Jonathan & Bienvenu Joffrey v.2 (04/03/16)
+    implementation: Maroit Jonathan & Bienvenu Joffrey & Laurent Emilie v.5 (23/03/16)
     """
-
     # Initialisation of variables
     data_map = {'player1': {},
                 'player1info': [],
@@ -33,6 +33,7 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
                 'main_turn': 1,
                 'attack_turn': 0,
                 'map_size': map_size}
+
 
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
@@ -52,5 +53,14 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
 
                     data_map['player' + str(i + 1)][(x_pos, y_pos)] = [unit, player_data[i], life]
         data_map['player' + str(i + 1) + 'info'].extend([player_data[i], player_data[i + 2]])
+
+    #Randomize which player will start the game.
+    number = random.randint(1,2)
+    if number == 1:
+        data_map['player1info'][1] = name_player1
+        data_map['player2info'][1] = name_player2
+    else:
+        data_map['player1info'][1] = name_player2
+        data_map['player2info'][1] = name_player1
 
     return data_map

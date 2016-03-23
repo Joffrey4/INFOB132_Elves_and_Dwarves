@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def in_not_game_ended(data_map):
+def is_not_game_ended(data_map):
     """Check if the game is allow to continue.
 
     Parameter:
@@ -13,10 +13,12 @@ def in_not_game_ended(data_map):
     continue_game : boolean value who said if the game need to continue(bool).
     loser : the player who lose the game(str).
     winner : the player who won the game(str).
+
     Notes:
     ------
     The game stop when a player run out of unit or if 20 turn have been played without any attack.
     In this case, the player 1 win.
+
     Version:
     -------
     specification: Maroit Jonathan(v.1 21/03/16)
@@ -35,7 +37,7 @@ def in_not_game_ended(data_map):
             continue_game = False
 
     # If there's 20 turn without any attack, player1 loose and player2 win.
-    if data_map['attack_turn'] >= 20:
+    if data_map['attack_turn'] > 20:
         loser = 'player1'
         winner = 'player2'
         continue_game = False

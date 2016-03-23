@@ -2,5 +2,11 @@
 
 TO DO:
 """"""
-Size: map_size dans la structure de données.
 Spec: si le joueur joue contre l'IA, le nom du player dans la structure de données est 'IA'
+
+
+IMPORTS:
+~~~~~~~~
+from colorama import Fore, Back, Style
+import random
+import pickle
