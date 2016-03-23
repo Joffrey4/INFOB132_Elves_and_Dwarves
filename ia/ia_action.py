@@ -1,6 +1,6 @@
 # -*- coding: ascii -*-
 import random
-)
+
 
 def ia_action(player, data_map):
     """The artificial intelligence of the game. Generate an instruction and execute it.
@@ -8,6 +8,10 @@ def ia_action(player, data_map):
     Parameters:
     -----------
     data_map: the whole database of the game (dict)
+
+    Returns:
+    --------
+    command: commands to execute to play (str)
 
     Version:
     --------
