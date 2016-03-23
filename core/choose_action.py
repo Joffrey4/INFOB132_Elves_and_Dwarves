@@ -29,10 +29,9 @@ def choose_action(data_map):
 
     print 'It is the turn of %s' % (data_map[str(player) + '_info'][1])
 
-    # AJOUTER IF POUR DEFINIR SI PLAYER OU IA JOUE.
+    # Tells whether IA or player's turn.
     if data_map[str(player+'_info')][1] == 'IA':
         game_instruction = ia_action(player, data_map)
-    # APPELE IA_ACTION
     else:
         game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
@@ -50,4 +49,4 @@ def choose_action(data_map):
 
     data_map['main_turn'] += 1
 
-    display_map(data_map, map_size)
+    return data_map
