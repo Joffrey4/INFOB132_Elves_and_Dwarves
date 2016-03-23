@@ -2,7 +2,7 @@
 import random
 
 def ia_action(player,enemy, data_map):
-    """The artificial intelligence of the game. Generate an instruction and execute it.
+    """The artificial intelligence of the game. Generate an instruction .
 
     Parameters:
     -----------
@@ -98,6 +98,5 @@ def ia_action(player,enemy, data_map):
 
     print command
     return command
-ia_action('player1','player2', data_map)
 
 
