@@ -1,6 +1,7 @@
 # -*- coding: ascii -*-
 
 
+
 def choose_action(data_map):
     """Ask and execute the instruction given by the players to move or attack units.
 
