@@ -34,7 +34,6 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
                 'attack_turn': 0,
                 'map_size': map_size}
 
-
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
     for i in range(2):
@@ -54,8 +53,8 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
                     data_map['player' + str(i + 1)][(x_pos, y_pos)] = [unit, player_data[i], life]
         data_map['player' + str(i + 1) + 'info'].extend([player_data[i], player_data[i + 2]])
 
-    #Randomize which player will start the game.
-    number = random.randint(1,2)
+    # Randomize which player will start the game.
+    number = random.randint(1, 2)
     if number == 1:
         data_map['player1info'][1] = name_player1
         data_map['player2info'][1] = name_player2
