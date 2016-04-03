@@ -31,10 +31,11 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
         data_ui = creat_data_ui(data_map)
 
     # Diplay introduction event and the map.
-    play_event(sound, None, None, 'intro')
+    play_event(sound, player, player_name, 'intro') #None has been replaced by player and player_name. TODO: initialize player and player _name
     display_map(data_map)
     # Run de game turn by turn
-    while is_not_game_ended():
+    continue_game = is_not_game_ended(data_map)
+    while continue_game:
         data_map = choose_action(data_map)
         display_map(data_map)
         save_data_map(data_map)
