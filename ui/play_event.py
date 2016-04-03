@@ -36,7 +36,7 @@ def play_event(sound, player, player_name, event):
             time_count += 1
             if time_count == 18:
                 time_count = 0
-                display_event(player, player_name, event) #Cannot have 4 arguments, count_line has been deleted
+                display_event(player, player_name, event) #Cannot have 4 arguments, count_line has been deleted.
                 count_line += 1
             stream.write(data)
             data = wf.readframes(chunk)
