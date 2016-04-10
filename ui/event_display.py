@@ -4,13 +4,13 @@ from IPython.display import clear_output
 from colorama import Fore, Back, Style
 
 
-def event_display(data_map, event, player):
+def event_display(data_map, event, player=0):
     """Print a line of the screen which representst the actualy situation with the name of the concerned player
     Parameters:
     -----------
     data_map: the whole database (dict)
     event : the event who represent the situation ; introduction , game over or winner screen (str)
-    player: which player has an event to display (str)
+    player: which player has an event to display (str, optional)
 
     Version:
     -------
