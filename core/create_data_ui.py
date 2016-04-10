@@ -66,7 +66,7 @@ def create_data_ui(data_map):
 
     # Generate and save the content of the statistics.
     for i in range(4):
-        data_ui[data_map['map_size'] + 9 + i] = border_coloured_left + border_black + ' ' + border_white + Fore.BLACK '%(stat' + str(i+1) + '1)s' + border_white + '%(stat' + str(i+1) + '2)s' + border_white + ' ' + border_black + border_coloured_middle
+        data_ui[data_map['map_size'] + 9 + i] = border_coloured_left + border_black + ' ' + border_white + Fore.BLACK + '%(stat' + str(i+1) + '1)s' + border_white + '%(stat' + str(i+1) + '2)s' + border_white + ' ' + border_black + border_coloured_middle
         data_ui[data_map['map_size'] + 9 + i] += border_black + ' ' + border_white + '%(stat' + str(i+1) + '3)s' + border_white + '%(stat' + str(i+1) + '4)s' + border_white + ' ' + border_black + border_coloured_right
 
     # Generate and save the foot of the statistics.
