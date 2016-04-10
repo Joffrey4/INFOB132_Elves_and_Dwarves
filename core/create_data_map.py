@@ -3,7 +3,7 @@ from colorama import Fore
 import random
 
 
-def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
+def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac', clear):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
@@ -62,6 +62,6 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
         data_map['player1info'][1] = name_player2
         data_map['player2info'][1] = name_player1
 
-    data_map['data_ui'] = create_data_ui(data_map)
+    data_map['data_ui'] = create_data_ui(data_map, clear)
 
     return data_map

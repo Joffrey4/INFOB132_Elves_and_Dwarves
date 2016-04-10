@@ -2,63 +2,85 @@
 from colorama import Fore, Back, Style
 
 
-# FONCTIONNE UNIQUEMENT AVEC UN TABLEAU DE 20x20
-def display_map(data_map):
-    """Display the map of the game.
+def create_data_ui(data_map, clear):
+    """Generate the whole user's interface with the statistics.
 
     Parameters:
     -----------
-    data_map: the whole database of the game (dict)
+    data_map: the whole database (dict)
 
-    Version:
+    Returns:
     --------
-    specification: Laurent Emilie v.1 (12/02/16)
-    implementation: Bienvenu Joffrey v.3 (01/04/16)
+    data_ui: the user's interface to print (list)
+
+    Versions:
+    ---------
+    specification: Laurent Emilie v.1 (15/03/16)
+    implementation: Bienvenu Joffrey v.3.1 (24/03/16)
     """
-    clear_output()
+    data_ui = [[]] * (16 + data_map['map_size'])
 
-    # Check which player have to play and define displaying constants.
-    player = 'player' + str((data_map['main_turn'] % 2) + 1)
-    ui_color = data_map[player + 'info'][0]
+    # Initialisation of the displaying constants.
+    grid_size = 5 * data_map['map_size']
+    ui_color = '%(ui_color)s'
 
-    data_cell = {'ui_color': ui_color}
+    line_coloured = ui_color + ('█' * 130) + Style.RESET_ALL
+    border_black = Back.BLACK + '  ' + Style.RESET_ALL
 
-    # Generate the units to be displayed.
+    margin = 9
+    if clear:
+        margin = 5
+
+    margin_left = ((20 - data_map['map_size']) * 5) / 2
+    margin_right = ((20 - data_map['map_size']) * 5) - (((20 - data_map['map_size']) * 5) / 2)
+    border_coloured_margin_left = ui_color + ('█' * (margin + margin_left)) + Style.RESET_ALL
+    border_coloured_margin_right = ui_color + ('█' * (margin + margin_right)) + Style.RESET_ALL
+    border_coloured_left = ui_color + ('█' * margin) + Style.RESET_ALL
+    border_coloured_right = ui_color + ('█' * margin) + Style.RESET_ALL
+    border_coloured_middle = ui_color + ('█' * 8) + Style.RESET_ALL
+
+    border_white = ' ' * 2
+
+    # Generate and save the top of the UI.
+    for i in range(3):
+        data_ui[i] = line_coloured
+
+    # Generate and save the top of the grid.
+    turn_message = 'Turn %(turn)s - %(playername)s, it\'s up to you ! %(blank)s'
+    data_ui[3] = border_coloured_margin_left + Fore.WHITE + Back.BLACK + '  ' + turn_message + '  ' + Style.RESET_ALL + border_coloured_margin_right
+    data_ui[4] = border_coloured_margin_left + border_black + ' ' * (grid_size + 8) + border_black + border_coloured_margin_right
+
+    # Generate and save the architecture of the grid.
     for i in range(1, data_map['map_size'] + 1):
+        data_ui[i + 4] = border_coloured_margin_left + border_black + Fore.BLACK + ' ' + ('0' + str(i))[-2:] + ' ' + Style.RESET_ALL
         for j in range(1, data_map['map_size'] + 1):
+            data_ui[i + 4] += '%((' + str(i) + ',' + str(j) + '))5s' + Style.RESET_ALL
+        data_ui[i + 4] += '    ' + border_black + border_coloured_margin_right
 
-            # Coloration black/white of the cells.
-            background_cell = ''
-            if (i + j) % 2 == 0:
-                background_cell = Back.WHITE
+    # Generate and save the foot of the grid.
+    data_ui[data_map['map_size'] + 5] = border_coloured_margin_left + border_black + Fore.BLACK + '   '
+    for i in range(1, data_map['map_size'] + 1):
+        data_ui[data_map['map_size'] + 5] += '  ' + ('0' + str(i))[-2:] + ' '
+    data_ui[data_map['map_size'] + 5] += '     ' + border_black + border_coloured_margin_right
 
-            if (i, j) in data_map['player1']:
-                data_cell['(' + str(i) + ',' + str(j) + ')'] = data_map['player1'][(i, j)][1] + background_cell + ' ☻' + str(data_map['player1'][(i, j)][0]) + (str(data_map['player1'][(i, j)][2]) + ' ')[:2]
-            elif (i, j) in data_map['player2']:
-                data_cell['(' + str(i) + ',' + str(j) + ')'] = data_map['player2'][(i, j)][1] + background_cell + ' ☻' + str(data_map['player2'][(i, j)][0]) + (str(data_map['player2'][(i, j)][2]) + ' ')[:2]
-            else:
-                data_cell['(' + str(i) + ',' + str(j) + ')'] = background_cell + (' ' * 5)
+    data_ui[data_map['map_size'] + 6] = border_coloured_margin_left + Back.BLACK + (grid_size + 12) * ' ' + Style.RESET_ALL + border_coloured_margin_right
 
-    # Generate the statistics to be displayed.
-    player1_cell = data_map['player1'].keys()
-    cell1_couter = 0
-    player2_cell = data_map['player2'].keys()
-    cell2_couter = 0
-    unit_name = {'E': 'Elf', 'D': 'Dwarf'}
+    # Generate and save the top of the statistics.
+    data_ui[data_map['map_size'] + 7] = line_coloured
 
-    for i in range(1, 5):
-        for j in range(1, 3):
-            data_cell['stat' + str(i) + str(j)] = (('0' + str(player1_cell[cell1_couter][0]))[-2:] + '-' + ('0' + str(player1_cell[cell1_couter][1]))[-2:] + ' ' + unit_name[data_map['player1'][player1_cell[cell1_couter]][0]] + ' hp: ' + str(data_map['player1'][player1_cell[cell1_couter]][2]) + ' ' * 20)[:20]
-            cell1_couter += 1
-        for j in range(3, 5):
-            data_cell['stat' + str(i) + str(j)] = (('0' + str(player2_cell[cell2_couter][0]))[-2:] + '-' + ('0' + str(player2_cell[cell2_couter][1]))[-2:] + ' ' + unit_name[data_map['player2'][player2_cell[cell2_couter]][0]] + ' hp: ' + str(data_map['player2'][player2_cell[cell2_couter]][2]) + ' ' * 20)[:20]
-            cell2_couter += 1
+    data_ui[data_map['map_size'] + 8] = border_coloured_left + Fore.WHITE + Back.BLACK + '  Your units:' + (' ' * 39) + Style.RESET_ALL + border_coloured_middle
+    data_ui[data_map['map_size'] + 8] += Fore.WHITE + Back.BLACK + '  Opponent\'s units:' + (' ' * 33) + Style.RESET_ALL + border_coloured_right
 
-    # Generate the title of the map to be displayed.
-    data_cell['turn'] = str(data_map['main_turn']/2 + 1)
-    data_cell['playername'] = data_map[player + 'info'][1]
-    data_cell['blank'] = ((data_map['map_size'] * 5) - 19 - len(data_cell['turn']) - len(data_cell['playername'])) * ' '
+    # Generate and save the content of the statistics.
+    for i in range(4):
+        data_ui[data_map['map_size'] + 9 + i] = border_coloured_left + border_black + ' ' + border_white + Fore.BLACK + '%(stat' + str(i+1) + '1)s' + border_white + '%(stat' + str(i+1) + '2)s' + border_white + ' ' + border_black + border_coloured_middle
+        data_ui[data_map['map_size'] + 9 + i] += border_black + ' ' + border_white + '%(stat' + str(i+1) + '3)s' + border_white + '%(stat' + str(i+1) + '4)s' + border_white + ' ' + border_black + border_coloured_right
 
-    # Print the top of the UI.
-    for line in data_map['data_ui']:
-        print line % data_cell
+    # Generate and save the foot of the statistics.
+    data_ui[data_map['map_size'] + 13] = border_coloured_left + Back.BLACK + (' ' * 52) + Style.RESET_ALL + border_coloured_middle
+    data_ui[data_map['map_size'] + 13] += Back.BLACK + (' ' * 52) + Style.RESET_ALL + border_coloured_right
+
+    for i in range(2):
+        data_ui[data_map['map_size'] + 14 + i] = line_coloured
+
+    return data_ui
