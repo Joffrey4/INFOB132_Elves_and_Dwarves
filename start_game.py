@@ -30,7 +30,7 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
         data_map = create_data_map(map_size, player1, player2)
 
     # Diplay introduction event and the map.
-    play_event(sound, player, player_name, 'intro') #None has been replaced by player and player_name. TODO: initialize player and player _name !
+    event_display(data_map, 'intro')
     display_map(data_map)
     # Run de game turn by turn
     continue_game = is_not_game_ended(data_map)
@@ -44,7 +44,9 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
 
     # Display the game-over event (versus IA).
     if player1 == 'IA' or player2 == 'IA':
-        play_event(sound, loser, data_map[str(loser + 'info')][1], 'game_over')
+        player = loser
+        event_display(data_map, 'game_over', player)
     # Display the win event (versus real player).
     else:
-        play_event(sound, winner, data_map[str(winner + 'info')][1], 'win')
+        player = winner
+        event_display(data_map, 'win', player)
