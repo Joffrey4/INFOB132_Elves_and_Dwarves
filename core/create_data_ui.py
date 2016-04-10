@@ -8,6 +8,7 @@ def create_data_ui(data_map, clear):
     Parameters:
     -----------
     data_map: the whole database (dict)
+    clear: Activate the "clear_output" of the notebook. Game looks more realistic (bool)
 
     Returns:
     --------
@@ -25,12 +26,13 @@ def create_data_ui(data_map, clear):
     ui_color = '%(ui_color)s'
 
     margin = 5
+    line_coloured = ui_color + ('█' * (117 + margin)) + Style.RESET_ALL
     if clear:
         margin = 9
+        line_coloured = ui_color + ('█' * (121 + margin)) + Style.RESET_ALL
 
-    line_coloured = ui_color + ('█' * (117 + margin)) + Style.RESET_ALL
+
     border_black = Back.BLACK + '  ' + Style.RESET_ALL
-
     margin_left = ((20 - data_map['map_size']) * 5) / 2
     margin_right = ((20 - data_map['map_size']) * 5) - (((20 - data_map['map_size']) * 5) / 2)
     border_coloured_margin_left = ui_color + ('█' * (margin + margin_left)) + Style.RESET_ALL

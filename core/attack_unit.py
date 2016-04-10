@@ -33,9 +33,9 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
     if attacker_coord in data_map[player] and target_coord in data_map[enemy]:
 
         # Check if the attack is rightful and save it.
-        if (attacker_coord[0] - 2, attacker_coord[1] - 2) <= target_coord <= (attacker_coord[0] + 2, attacker_coord[1] + 2):
+        if attacker_coord[0] - 2 <= target_coord[0] <= attacker_coord[0] + 2 and attacker_coord[1] - 2 <= target_coord[1] <= attacker_coord[1] + 2:
             attacker_type = data_map[player][attacker_coord][0]
-            if attacker_type == 'E' or ((attacker_coord[0] - 1, attacker_coord[1] - 1) <= target_coord <= (attacker_coord[0] + 1, attacker_coord[1] + 1)):
+            if attacker_type == 'E' or (attacker_coord[0] - 1 <= target_coord[0] <= attacker_coord[0] + 1 and attacker_coord[1] - 1 <= target_coord[1] <= attacker_coord[1] + 1):
 
                 # Decrement the heal point and delete the unit if their hp are equal or less than 0.
                 data_map[enemy][target_coord][2] -= damage[attacker_type]

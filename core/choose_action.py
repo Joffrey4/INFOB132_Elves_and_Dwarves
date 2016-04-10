@@ -47,9 +47,8 @@ def choose_action(data_map):
                         (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
             attack_counter += attacked
         elif '-m->' in list_action2[i]:
-            data_map, attacked = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+            data_map= move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                       (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
-            attack_counter += attacked
 
     # Save if a player have attacked.
     if attack_counter:
