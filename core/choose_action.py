@@ -22,27 +22,22 @@ def choose_action(data_map):
     specification: Laurent Emilie v.1 (11/02/16)
     implementation: Laurent Emilie v.3 (21/03/16)
     """
-
     player = 'player' + str((data_map['main_turn'] % 2) + 1)
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
 
-
-    print 'It is the turn of %s' % (data_map[str(player) + 'info'][1])
-
     # Tells whether IA or player's turn.
-    if data_map[str(player+'info')][1] == 'IA':
+    if data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, player, enemy)
     else:
-        game_instruction = raw_input(player + ' enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
+        game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
-    list_action = []
     list_action = game_instruction.split()
 
-    #grouper instruction par instructions
+    # grouper instruction par instructions
     list_action2 = []
-    for instruction in range(0,len(list_action),3):
-        list_action2.append((list_action[instruction],list_action[instruction+1],list_action[instruction+2]))
+    for instruction in range(0, len(list_action), 3):
+        list_action2.append((list_action[instruction], list_action[instruction + 1], list_action[instruction + 2]))
 
     # Call attack_unit or move_unit in function of instruction.
     for i in range(len(list_action2)):
