@@ -31,7 +31,7 @@ def is_not_game_ended(data_map):
 
     # If a player has not any units, the other player win.
     for i in range(2):
-        if len(data_map['player' + str(i + 1)]) == 0:
+        if not len(data_map['player' + str(i + 1)]) and continue_game:
             loser = 'player' + str(i + 1)
             winner = 'player' + str(3 - (i + 1))
             continue_game = False
