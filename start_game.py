@@ -6,7 +6,7 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
 
     Parameters:
     -----------
-    player1: Name of the first player (str)
+    player1: Name of the first player (str).
     player2: Name of the second player or AI (str)
     map_size: Size of the map that players wanted to play with (int)
     file_name: File of the name to load if necessary (str)
