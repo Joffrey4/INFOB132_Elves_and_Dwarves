@@ -31,7 +31,7 @@ def choose_action(data_map):
 
     # Tells whether IA or player's turn.
     if data_map[str(player+'info')][1] == 'IA':
-        game_instruction = ia_action(player, data_map)
+        game_instruction = ia_action(data_map, player, enemy)
     else:
         game_instruction = raw_input(player + ' enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
