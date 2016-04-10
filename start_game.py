@@ -1,9 +1,8 @@
 # -*- coding: ascii -*-
 
 
-def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sound=False):
+def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sound=False, clear=False):
     """Start the entire game.
-
     Parameters:
     -----------
     player1: Name of the first player (str).
@@ -11,13 +10,11 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     map_size: Size of the map that players wanted to play with (int)
     file_name: File of the name to load if necessary (str)
     sound: Activate the sound or not (bool)
-
     Notes:
     ------
     It is the main function that gonna call the other functions.
     map_size must be contained between 7 and 30
     file_name load a game only if the game was saved earlier
-
     Version:
     -------
     specification: Laurent Emilie & Maroit Jonathan v.1 (10/03/16)
@@ -31,12 +28,11 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
 
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')
-    display_map(data_map)
     # Run de game turn by turn
     continue_game = is_not_game_ended(data_map)
     while continue_game:
-        data_map = choose_action(data_map)
         display_map(data_map)
+        data_map = choose_action(data_map)
         save_data_map(data_map)
 
     # Find the loser and the winner for the end game event.
