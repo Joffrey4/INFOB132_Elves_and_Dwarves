@@ -36,7 +36,9 @@ def choose_action(data_map):
         game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
-    list_action = game_instruction.split('   ')
+    list_action = game_instruction.split()
+    for i in range(0,len(list_action),3):
+    list_action[i] = (list_action[i],list_action[i+1],list_action[i+2])
 
     # Call attack_unit or move_unit in function of instruction.
     for i in range(len(list_action)):
