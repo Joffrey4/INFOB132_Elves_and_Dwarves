@@ -1,84 +1,59 @@
 # -*- coding: ascii -*-
-import random
 
-def ia_action(player,enemy, data_map):
-    """The artificial intelligence of the game. Generate an instruction .
+
+def ia_action(data_map, ia, player):
+    """The artificial intelligence of the game. Generate an instruction and return it.
 
     Parameters:
     -----------
-    data_map: the whole database of the game (dict)
+    data_map: the whole database of the game (dict).
+    ia: the ia identifier ('player1' or 'player2', string).
+    player: the player identifier ('player1' or 'player2', string).
+
+    Return:
+    -------
+    command: the instruction of the ia (string).
 
     Version:
     --------
     specification: Laurent Emilie and Bienvenu Joffrey v. 1 (02/03/16)
-    implementation: Bienvenu Joffrey and Maroit Jonathan v. 1 (21/03/16)
+    implementation: Bienvenu Joffrey and Jonathan Maroit v. 3 (21/03/16)
     """
     command = ''
-    action_type = ['-a->','-m->']
-    used_units = []
+    unit_type = ['D', 'E']
 
+    # ATTACK PART: Take each ia's unit and each player's unit.
+    for unit in data_map[ia]:
+        unit_has_attacked_or_moved = False
+        for enemy_unit in data_map[player]:
 
-    for units in data_map[player]:
-        start_x_pos = (('0' + str(units[0]))[-2:])
-        start_y_pos = (('0' + str(units[1]))[-2:])
-        unit_type = data_map[player][units][0]
-        enable_move_x=[0]
-        enable_move_y=[0]
-        if int(start_x_pos) == 1:
-            enable_move_x.append(1)
-        elif int(start_x_pos) == data_map['map_size']:
-            enable_move_x.append(-1)
-        else:
-            enable_move_x.append(-1)
-            enable_move_x.append(1)
+            # If the unit hasn't already find a target, check if the player's unit is in its area.
+            if not unit_has_attacked_or_moved:
+                for i in range(2):
+                    if data_map[ia][unit][0] == unit_type[i] and (unit[0] - (1 + i)) <= enemy_unit[0] <= (unit[0] + (1 + i)) and (unit[1] - (1 + i)) <= enemy_unit[1] <= (unit[1] + (1 + i)):
 
-        if int(start_y_pos) == 1:
-            enable_move_y.append(1)
-        elif int(start_y_pos) == data_map['map_size']:
-            enable_move_y.append(-1)
-        else:
-            enable_move_y.append(-1)
-            enable_move_y.append(1)
+                        # Write the attack.
+                        command += ('0' + str(unit[0]))[-2:] + '_' + ('0' + str(unit[1]))[-2:] + ' -a-> ' + ('0' + str(enemy_unit[0]))[-2:] + '_' + ('0' + str(enemy_unit[1]))[-2:] + '   '
+                        unit_has_attacked_or_moved = True
 
+        # MOVE PART: Check if the unit hasn't attacked yet.
+        if not unit_has_attacked_or_moved:
+            target_cell = []
 
-        if unit_type == 'E':
+            # Generate a list with the allowed cell to move of the unit.
+            for x_pos in range(unit[0] - 1, unit[0] + 2):
+                for y_pos in range(unit[1] - 1, unit[1] + 2):
+                    target_cell.append(x_pos, y_pos)
 
-            for target in data_map[enemy]:
+            # For each generated cell, check if the cell is free and if the unit can move.
+            for cell in target_cell:
+                if not unit_has_attacked_or_moved and cell not in data_map[ia]:
+                    if (data_map[ia][unit][0] == 'D' and abs(cell[0] - unit[0]) + abs(cell[1] - unit[1]) == 1) or data_map[ia][unit][0] == 'E':
 
-                if (int(start_x_pos) - 2, int(start_y_pos) - 2) <= target <= (int(start_x_pos) + 2, int(start_y_pos) + 2):
-
-                    used_units.append(units)
-
-                    command += str(start_x_pos) + '_' + str(start_y_pos) + ' ' + action_type[0] + ('0'+str(target[0]))[-2:] + '_' + ('0'+str(target[1]))[-2:]+ '   '
-
-            if units not in used_units:
-
-                target_x_pos = int(start_x_pos)+enable_move_x[random.randint(0, (len(enable_move_x)-1))]
-                target_y_pos = int(start_y_pos)+enable_move_y[random.randint(0, (len(enable_move_y)-1))]
-
-                if (target_x_pos,target_y_pos) not in data_map[player] and (target_x_pos,target_y_pos) not in data_map[enemy]:
-                    print 'done'
-                    command += str(start_x_pos) + '_' + str(start_y_pos) + ' ' + action_type[1] +(('0'+str(target_x_pos))[-2:]) + '_' + (('0'+str(target_y_pos))[-2:]) + '   '
-
-        if unit_type == 'D':
-
-
-            for target in data_map[enemy]:
-
-                if  (int(start_x_pos) - 1, int(start_y_pos) - 1) <= target <= (int(start_x_pos) + 1, int(start_y_pos) + 1):
-                    used_units.append(units)
-                    command += str(start_x_pos) + '_' + str(start_y_pos) + ' ' + action_type[0] + ('0'+str(target[0])[-2:] + '_' + ('0'+str(target[1]))[-2:] + '   '
-
-            if units not in used_units:
-
-                target_x_pos = int(start_x_pos)+enable_move_x[random.randint(0, (len(enable_move_x)-1))]
-                if target_x_pos == int(start_x_pos):
-                    target_y_pos = int(start_y_pos)+enable_move_y[random.randint(0, (len(enable_move_y)-1))]
-                if (target_x_pos,target_y_pos) not in data_map[player] and (target_x_pos,target_y_pos) not in data_map[enemy]:
-                    print 'done'
-                    command += str(start_x_pos) + '_' + str(start_y_pos) + ' ' + action_type[1] +(('0'+str(target_x_pos))[-2:]) + '_' + (('0'+str(target_y_pos))[-2:]) + '   '
+                        # Write the move.
+                        command += ('0' + str(unit[0]))[-2:] + '_' + ('0' + str(unit[1]))[-2:] + ' -m-> ' + ('0' + str(cell[0]))[-2:] + '_' + ('0' + str(cell[1]))[-2:] + '   '
+                        unit_has_attacked_or_moved = True
 
     return command
-
 
 
