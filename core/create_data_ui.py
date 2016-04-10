@@ -24,12 +24,12 @@ def create_data_ui(data_map, clear):
     grid_size = 5 * data_map['map_size']
     ui_color = '%(ui_color)s'
 
-    line_coloured = ui_color + ('█' * 130) + Style.RESET_ALL
-    border_black = Back.BLACK + '  ' + Style.RESET_ALL
-
-    margin = 9
+    margin = 5
     if clear:
-        margin = 5
+        margin = 9
+
+    line_coloured = ui_color + ('█' * (117 + margin)) + Style.RESET_ALL
+    border_black = Back.BLACK + '  ' + Style.RESET_ALL
 
     margin_left = ((20 - data_map['map_size']) * 5) / 2
     margin_right = ((20 - data_map['map_size']) * 5) - (((20 - data_map['map_size']) * 5) / 2)

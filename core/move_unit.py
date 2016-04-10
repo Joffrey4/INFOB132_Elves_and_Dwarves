@@ -25,6 +25,7 @@ def move_unit(data_map, start_coord, end_coord, player, enemy):
     specification: Laurent Emilie & Bienvenu Joffrey v.2 (17/02/16)
     implementation: Laurent Emilie & Bienvenu Joffrey v.2 (17/03/16)
     """
+    attacked = 0
 
     # Check if there's a unit on the starting cell, and if the destination cell is free.
     if start_coord in data_map[player] and end_coord not in data_map[player]and end_coord not in data_map[enemy]:
@@ -34,4 +35,4 @@ def move_unit(data_map, start_coord, end_coord, player, enemy):
             if data_map[player][start_coord][0] == 'E' or (sum(start_coord) - 1 <= sum(end_coord) <= sum(start_coord) + 1):
                 data_map[player][end_coord] = data_map[player].pop(start_coord)
 
-    return data_map
+    return data_map, attacked

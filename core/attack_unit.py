@@ -27,6 +27,7 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
     implementation: Bienvenu Joffrey v.1 (17/03/16)
     """
     damage = {'E': 1, 'D': 3}
+    attacked = 0
 
     # Check if there's a unit on the attacker cell, and if the attacked cell is occupied.
     if attacker_coord in data_map[player] and target_coord in data_map[enemy]:
@@ -40,5 +41,6 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
                 data_map[enemy][target_coord][2] -= damage[attacker_type]
                 if data_map[enemy][target_coord][2] <= 0:
                     del data_map[enemy][target_coord]
+                attacked = 1
 
-    return data_map
+    return data_map, attacked

@@ -40,14 +40,21 @@ def choose_action(data_map):
         list_action2.append((list_action[instruction], list_action[instruction + 1], list_action[instruction + 2]))
 
     # Call attack_unit or move_unit in function of instruction.
+    attack_counter = 0
     for i in range(len(list_action2)):
         if '-a->' in list_action2[i]:
-            attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+            data_map, attacked = attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                         (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
         elif '-m->' in list_action2[i]:
-            move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+            data_map, attacked = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                       (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
+        attack_counter += attacked
 
+    # Save if a player have attacked.
+    if attack_counter:
+        data_map['attack_turn'] = 0
+    else:
+        data_map['attack_turn'] += 1
     data_map['main_turn'] += 1
 
     return data_map
