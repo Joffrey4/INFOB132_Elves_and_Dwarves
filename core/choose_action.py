@@ -33,7 +33,7 @@ def choose_action(data_map):
     if data_map[str(player+'info')][1] == 'IA':
         game_instruction = ia_action(player, data_map)
     else:
-        game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
+        game_instruction = raw_input(player + ' enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
     list_action = []
@@ -45,11 +45,11 @@ def choose_action(data_map):
         list_action2.append((list_action[instruction],list_action[instruction+1],list_action[instruction+2]))
 
     # Call attack_unit or move_unit in function of instruction.
-    for i in range(len(list_action)):
-        if '-a->' in list_action[i]:
+    for i in range(len(list_action2)):
+        if '-a->' in list_action2[i]:
             attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                         (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
-        elif '-m->' in list_action[i]:
+        elif '-m->' in list_action2[i]:
             move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                       (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player)
 
