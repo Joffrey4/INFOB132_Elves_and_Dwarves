@@ -29,7 +29,7 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')
     # Run de game turn by turn
-    continue_game = is_not_game_ended(data_map)
+    continue_game, loser, winner = is_not_game_ended(data_map)
     while continue_game:
         display_map(data_map, clear)
         data_map = choose_action(data_map)
