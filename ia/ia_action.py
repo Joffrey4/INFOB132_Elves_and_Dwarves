@@ -43,7 +43,7 @@ def ia_action(data_map, ia, player):
             # Generate a list with the allowed cell to move of the unit.
             for x_pos in range(unit[0] - 1, unit[0] + 2):
                 for y_pos in range(unit[1] - 1, unit[1] + 2):
-                    if x_pos <= data_map['map_size'] or x_pos <= data_map['map_size']:
+                    if x_pos <= data_map['map_size'] and x_pos <= data_map['map_size']:
                         target_cell.append((x_pos, y_pos))
 
             # For each generated cell, check if the cell is free and if the unit can move.
