@@ -25,10 +25,9 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     """
     # Creation of the database or load it.
     if file_name:
-        data_map, data_ui = load_map()
+        data_map = load_map()
     else:
         data_map = create_data_map(map_size, player1, player2)
-        data_ui = creat_data_ui(data_map)
 
     # Diplay introduction event and the map.
     play_event(sound, player, player_name, 'intro') #None has been replaced by player and player_name. TODO: initialize player and player _name !

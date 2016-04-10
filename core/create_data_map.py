@@ -32,7 +32,7 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
                 'player2info': [],
                 'main_turn': 1,
                 'attack_turn': 0,
-                'map_size': map_size}
+                'map_size': map_size,}
 
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
@@ -61,5 +61,7 @@ def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac'):
     else:
         data_map['player1info'][1] = name_player2
         data_map['player2info'][1] = name_player1
+
+    data_map['data_ui'] = create_data_ui(data_map)
 
     return data_map
