@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def move_unit(data_map, start_coord, end_coord, player):
+def move_unit(data_map, start_coord, end_coord, player, enemy):
     """Move an unit from a cell to another cell. And check if the move is legal.
 
     Parameters:

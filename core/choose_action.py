@@ -51,7 +51,7 @@ def choose_action(data_map):
                         (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
         elif '-m->' in list_action2[i]:
             move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
-                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player)
+                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
 
     data_map['main_turn'] += 1
 
