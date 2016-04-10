@@ -4,19 +4,21 @@ from IPython.display import clear_output
 from colorama import Fore, Back, Style
 
 
-def event_display(player, player_name, event):
+def event_display(data_map, event, player=0):
     """Print a line of the screen which representst the actualy situation with the name of the concerned player
     Parameters:
     -----------
-    player: tells if player 1 or player 2 concerned player (str)
-    player_name: name of the user to display (str)
-    event : the event who represent the situation ,introduction , game over, winner screen (str)
+    data_map: the whole database (dict)
+    event : the event who represent the situation ; introduction , game over or winner screen (str)
+    player: which player has an event to display (str, optional)
 
     Version:
     -------
-    specification: Maroit Jonathan and Laurent Emilie (v.1 16/02/16)
+    specification: Maroit Jonathan and Laurent Emilie (v.2 03/04/16)
     implementation: Maroit Jonathan (v.1 16/02/16)
     """
+    player_name = data_map[player + 'info'][1]
+
     if len(player_name) < 9:
         player_name += (9 - len(player_name)) * ' '
     player_name = player_name[0:9]
