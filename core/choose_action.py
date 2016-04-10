@@ -26,19 +26,18 @@ def choose_action(data_map):
     player = 'player' + str((data_map['main_turn'] % 2) + 1)
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
 
-
     print 'It is the turn of %s' % (data_map[str(player) + 'info'][1])
 
     # Tells whether IA or player's turn.
-    if data_map[str(player+'info')][1] == 'IA':
+    if data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(player, data_map)
     else:
         game_instruction = raw_input(player + 'enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
     list_action = game_instruction.split()
-    for i in range(0,len(list_action),3):
-    list_action[i] = (list_action[i],list_action[i+1],list_action[i+2])
+    for i in range(0, len(list_action), 3):
+        list_action[i] = (list_action[i], list_action[i + 1], list_action[i + 2])
 
     # Call attack_unit or move_unit in function of instruction.
     for i in range(len(list_action)):
