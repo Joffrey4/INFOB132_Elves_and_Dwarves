@@ -5,12 +5,13 @@ from colorama import Fore, Back, Style
 
 
 def event_display(data_map, event, player=0):
-    """Print a line of the screen which representst the actualy situation with the name of the concerned player
+    """Print a line of the screen which representst the actualy situation with the name of the concerned player.
+
     Parameters:
     -----------
     data_map: the whole database (dict)
     event : the event who represent the situation ; introduction , game over or winner screen (str)
-    player: which player has an event to display (str, optional)
+    player: which player has an event to display (int, optional)
 
     Version:
     -------
@@ -80,11 +81,10 @@ def event_display(data_map, event, player=0):
             d16 = '████████████        ████████    ████    ████    ████████        ████████████'
             d17 = (Fore.BLACK + Back.WHITE) + '                                                                            '
             death_list = [d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15, d16, d17]
+
             for line in death_list:
                 print (Fore.BLACK + color_player + line)
-                time.sleep(0.2)
-            time.sleep(4)
-            clear_output()
+                time.sleep(0.5)
 
         else:
             w0 = Back.BLACK + Fore.WHITE + '                          THE                           '
@@ -102,9 +102,7 @@ def event_display(data_map, event, player=0):
             w10 = Back.BLACK + Fore.WHITE + '                          IS                            '
             w11 = (Fore.WHITE + Back.BLACK) + '                        ' + player_name + '                       '
             win_list = [w0, wa, w1, w2, w3, w4, w5, w6, w7, w8, w9, wb, w10, w11]
+
             for win_line in win_list:
                 print (Fore.BLACK + color_player + win_line)
-
-                time.sleep(0.2)
-            time.sleep(4)
-            clear_output()
+                time.sleep(0.5)

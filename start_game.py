@@ -5,11 +5,12 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     """Start the entire game.
     Parameters:
     -----------
-    player1: Name of the first player (str).
-    player2: Name of the second player or AI (str)
-    map_size: Size of the map that players wanted to play with (int)
-    file_name: File of the name to load if necessary (str)
-    sound: Activate the sound or not (bool)
+    player1: Name of the first player (optional, str).
+    player2: Name of the second player or AI (optional, str)
+    map_size: Size of the map that players wanted to play with (optional, int)
+    file_name: File of the name to load if necessary (optional, str).
+    sound: Activate the sound or not (optional, bool).
+    clear: Activate the "clear_output" of the notebook. Game looks more realistic, but do not work properly on each computer (optional, bool).
     Notes:
     ------
     It is the main function that gonna call the other functions.
@@ -18,7 +19,7 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     Version:
     -------
     specification: Laurent Emilie & Maroit Jonathan v.1 (10/03/16)
-    implementation: Maroit Jonathan v.1 (21/03/16)
+    implementation: Maroit Jonathan & Bienvenu Joffrey v.1(21/03/16)
     """
     # Creation of the database or load it.
     if file_name:
@@ -28,15 +29,14 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
 
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')
+
     # Run de game turn by turn
-    continue_game = is_not_game_ended(data_map)
+    continue_game = True
     while continue_game:
         display_map(data_map, clear)
         data_map = choose_action(data_map)
         save_data_map(data_map)
-
-    # Find the loser and the winner for the end game event.
-    continue_game, loser, winner = is_not_game_ended()
+        continue_game, loser, winner = is_not_game_ended(data_map)
 
     # Display the game-over event (versus IA).
     if player1 == 'IA' or player2 == 'IA':

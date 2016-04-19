@@ -31,13 +31,13 @@ def is_not_game_ended(data_map):
 
     # If a player has not any units, the other player win.
     for i in range(2):
-        if len(data_map['player' + str(i + 1)]) == 0:
+        if not len(data_map['player' + str(i + 1)]) and continue_game:
             loser = 'player' + str(i + 1)
             winner = 'player' + str(3 - (i + 1))
             continue_game = False
 
     # If there's 20 turn without any attack, player1 loose and player2 win.
-    if data_map['attack_turn'] > 20:
+    if float(data_map['attack_turn']) / 2 > 19:
         loser = 'player1'
         winner = 'player2'
         continue_game = False
