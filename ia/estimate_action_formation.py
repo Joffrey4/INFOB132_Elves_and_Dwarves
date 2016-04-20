@@ -2,7 +2,7 @@
 
 
 def estimate_action_formation(data_ia, are_enemy, where_enemies, formation_scheme):
-    """Estimate whether our units have to keep the formation or to rebuild it.
+    """Estimate which action may the group of units doing and compute amount of points to allow the action.
 
     Parameters:
     -----------
@@ -13,7 +13,7 @@ def estimate_action_formation(data_ia, are_enemy, where_enemies, formation_schem
 
     Returns:
     --------
-    build_formation: tells whether the situation requieres to build the formation (bool)
+    action_type: actions with amount of points for each one (dict)
 
     Versions:
     ---------

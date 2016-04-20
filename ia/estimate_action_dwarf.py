@@ -2,7 +2,7 @@
 
 
 def estimate_action_dwarf(data_ia, build_formation, are_enemy, where_enemies):
-    """Estimate which is the best action whether the unit is a dwarf.
+    """Estimate which action may the dwarves doing and compute amount of points to allow the action.
 
     Parameters:
     -----------
@@ -13,8 +13,7 @@ def estimate_action_dwarf(data_ia, build_formation, are_enemy, where_enemies):
 
     Returns:
     --------
-    start_coord: ia's unit will do action coordinates format xx_xx (str)
-    end_coord: coordinates of attacked unit or to end the movement format xx_xx (str)
+    action_type: actions with amount of points for each one (dict)
 
     Versions:
     ---------
