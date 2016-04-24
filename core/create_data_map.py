@@ -3,17 +3,20 @@ from colorama import Fore
 import random
 
 
-def create_data_map(map_size=7, name_player1='Benoit', name_player2='Isaac', clear=False):
+def create_data_map(map_size=7, name_player1, name_player2, clear=False):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
     ----------
     map_size : the length of the board game, every unit add one unit to vertical axis and horizontal axis (int, optional).
+    name_player1: name of the first player (str)
+    name_player2: name of the second player (str)
+    clear: if you want to activate the clear screen (bool)
 
     Returns:
     -------
     data_map : dictionary that contain information's of every cells of the board (dict).
-    data_ui : list with data to display the ui (list of strings).
+    data_ui : list with data to display the ui (list of str).
 
     Notes:
     -----
