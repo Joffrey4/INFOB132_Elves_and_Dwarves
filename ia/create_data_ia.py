@@ -17,10 +17,11 @@ def create_data_ia(map_size=7):
     specifications: Laurent Emilie v.1 (24/04/16)
     implementation: Laurent Emilie v.1 (24/04/16)
     """
-    data_ia = {'player1': {},
-               'player2': {},
+    data_ia = {'ia': {},
+               'enemy': {},
                'main_turn': 1,
-               'attack_turn':0}
+               'attack_turn':0
+               'map_size': map_size}
 
     for i in range(2):
         for line in range(1, 4):
@@ -36,6 +37,9 @@ def create_data_ia(map_size=7):
                     x_pos = abs(i * map_size - line + i)
                     y_pos = abs(i * map_size - column + i)
 
-                    data_ia['player' + str(i + 1)][(x_pos, y_pos)] = [unit, life]
+                    if i==0:
+                        data_ia['ia'][(x_pos, y_pos)] = [unit, life]
+                    else:
+                        data_ia['enemy'][(x_pos, y_pos)] = [unit, life]
 
     return data_ia
