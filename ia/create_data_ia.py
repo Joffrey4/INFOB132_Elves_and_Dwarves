@@ -20,7 +20,7 @@ def create_data_ia(map_size=7):
     data_ia = {'player1': {},
                'player2': {},
                'main_turn': 1,
-               'attack_turn':0}
+               'attack_turn': 0}
 
     for i in range(2):
         for line in range(1, 4):
