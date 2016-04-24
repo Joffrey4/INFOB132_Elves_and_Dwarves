@@ -10,7 +10,7 @@ def create_data_ia(map_size=7):
 
     Returns:
     --------
-    data_ia: the ia database (dict)
+    data_ia: the ia database (dict).
 
     Versions:
     ---------
