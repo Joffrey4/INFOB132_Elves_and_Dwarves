@@ -1,13 +1,13 @@
 # -*- coding: ascii -*-
 
 
-def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sound=False, clear=False):
+def start_game(remote=1, player1='player 1', player2='player_2', map_size=7, file_name=None, sound=False, clear=False):
     """Start the entire game.
     Parameters:
     -----------
-    player1: Name of the first player (optional, str).
-    player2: Name of the second player or AI (optional, str)
-    map_size: Size of the map that players wanted to play with (optional, int)
+    player1: Name of the first player or IA (optional, str).
+    player2: Name of the second player or IA (optional, str).
+    map_size: Size of the map that players wanted to play with (optional, int).
     file_name: File of the name to load if necessary (optional, str).
     sound: Activate the sound or not (optional, bool).
     clear: Activate the "clear_output" of the notebook. Game looks more realistic, but do not work properly on each computer (optional, bool).
@@ -25,7 +25,13 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     if file_name:
         data_map = load_map()
     else:
-        data_map = create_data_map(map_size, player1, player2, clear)
+        data_map = create_data_map(remote, map_size, player1, player2, clear)
+
+    # If we play versus another ia, connect to her.
+    if remote:
+        connection = connect_to_player(player_id)
+    else:
+        connection = None
 
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')
@@ -34,9 +40,13 @@ def start_game(player1='player 1', player2='AI', map_size=7, file_name=None, sou
     continue_game = True
     while continue_game:
         display_map(data_map, clear)
-        data_map = choose_action(data_map)
+        data_map = choose_action(data_map, connection)
         save_data_map(data_map)
         continue_game, loser, winner = is_not_game_ended(data_map)
+
+    # Once the game is finished, disconnect from the other player.
+    if remote:
+        disconnect_from_player(connection)
 
     # Display the game-over event (versus IA).
     if player1 == 'IA' or player2 == 'IA':

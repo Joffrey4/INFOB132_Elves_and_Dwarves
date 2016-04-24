@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def choose_action(data_map):
+def choose_action(data_map, connection):
     """Ask and execute the instruction given by the players to move or attack units.
 
     Parameters:
@@ -26,10 +26,14 @@ def choose_action(data_map):
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
 
     # Tells whether IA or player's turn.
-    if data_map[str(player + 'info')][1] == 'IA':
+    if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, player, enemy)
+        notify_remote_orders(connection, game_instruction)
     else:
-        game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
+        if data_map['remote']:
+            game_instruction = get_remote_orders(connection)
+        else:
+            game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
     # Split commands string by string.
     list_action = game_instruction.split()
@@ -47,7 +51,7 @@ def choose_action(data_map):
                         (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
             attack_counter += attacked
         elif '-m->' in list_action2[i]:
-            data_map= move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+            data_map = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
                       (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
 
     # Save if a player have attacked.

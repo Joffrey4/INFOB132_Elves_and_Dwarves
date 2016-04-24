@@ -3,7 +3,7 @@ from colorama import Fore
 import random
 
 
-def create_data_map(map_size=7, name_player1, name_player2, clear=False):
+def create_data_map(remote, map_size=7, name_player1, name_player2, clear=False):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
@@ -35,7 +35,8 @@ def create_data_map(map_size=7, name_player1, name_player2, clear=False):
                 'player2info': [],
                 'main_turn': 1,
                 'attack_turn': 0,
-                'map_size': map_size,}
+                'map_size': map_size,
+                'remote': remote}
 
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
