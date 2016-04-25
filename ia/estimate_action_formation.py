@@ -60,6 +60,8 @@ def estimate_action_formation(data_ia, are_enemy, where_enemies, is_formation):
             #check whether the enemy can die whether ia's units attacks
             if data_ia['enemy'][adverse_coord] <= damage:
                 #ATTAQUER !!!
+            else:
+                #enemy looses damage HP
 
             #check if an ia unit can die whether enemy's unit attacks
             damage = 0
@@ -78,6 +80,36 @@ def estimate_action_formation(data_ia, are_enemy, where_enemies, is_formation):
                 #DEATH !!
             else:
             #Can ia's unit kill one enemy unit at the next turn ?
+                for adverse_coord in where_enemies:
+                    if adverse_coord in player_range['ia']:
+                        damage = 0
+                        for unit in player_range['ia'][adverse_coord]:
+                            if unit == 'E':
+                                damage += 1
+                            if unit == 'D':
+                                damage += 3
+                        if data_ia['enemy'][adverse_coord] <= damage:
+                            #ATTAQUER !!!
+                        else:
+                            #enemy looses damage HP
+                    damage = 0
+                    ia_unit_dead = []
+                    for ia_coord in data_ia['ia']:
+                        if ia_coord in where_enemies:
+                            for unit_id in player_range['enemy'][ia_coord]:
+                                if unit_id == 'E':
+                                    damage += 1
+                                if unit_id == 'D':
+                                    damage += 3
+                            if ia_coord[0] <= damage:
+                                #list of deaths
+                                ia_unit_dead.append(ia_coord)
+                        if ia_unit_dead == []:
+                            #DEATH !!
+                        else:
+                            #ATTACK !!!
+
+
         else:
             #Check whether there are enemy in my extended range (+1)
 
@@ -101,7 +133,7 @@ def estimate_action_formation(data_ia, are_enemy, where_enemies, is_formation):
             for adverse_coord in where_enemies:
                 if adverse_coord in player_extended_range['ia']:
                     damage = 0
-                    ia_unit_dead_2 = []
+                    ia_unit_dead = []
                     for ia_coord in data_ia['ia']:
                         if ia_coord in where_enemies:
                             for unit_id in player_extended_range['enemy'][ia_coord]:
@@ -111,13 +143,38 @@ def estimate_action_formation(data_ia, are_enemy, where_enemies, is_formation):
                                     damage += 3
                             if ia_coord[0] <= damage:
                                 #list of deaths
-                                ia_unit_dead_2.append(ia_coord)
-                    if ia_unit_dead_2 != []:
+                                ia_unit_dead.append(ia_coord)
+                    if ia_unit_dead != []:
                         # MOVE !!
-
                         # Can ia's unit kill one enemy unit at the next turn ?
-                    elif ia_unit_dead_2 == []:
-                        #DEATH !!
+                        for adverse_coord in where_enemies:
+                            if adverse_coord in player_range['ia']:
+                                damage = 0
+                                for unit in player_range['ia'][adverse_coord]:
+                                    if unit == 'E':
+                                        damage += 1
+                                    if unit == 'D':
+                                        damage += 3
+                                if data_ia['enemy'][adverse_coord] <= damage:
+                                    #ATTAQUER !!!
+                                else:
+                                    #enemy looses damage HP
+                            damage = 0
+                            ia_unit_dead = []
+                            for ia_coord in data_ia['ia']:
+                                if ia_coord in where_enemies:
+                                    for unit_id in player_range['enemy'][ia_coord]:
+                                        if unit_id == 'E':
+                                            damage += 1
+                                        if unit_id == 'D':
+                                            damage += 3
+                                    if ia_coord[0] <= damage:
+                                        #list of deaths
+                                        ia_unit_dead.append(ia_coord)
+                                if ia_unit_dead == []:
+                                    #DEATH !!
+                                elif ia_unit_dead != []:
+                                    #ATTACK
                 else:
                     #MOVE !! (to the enemy)
 
