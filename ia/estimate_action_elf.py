@@ -1,13 +1,12 @@
 # -*- coding: ascii -*-
 
 
-def estimate_action_elf(data_ia, build_formation, are_enemy, where_enemies):
+def estimate_action_elf(data_ia, are_enemy, where_enemies):
     """Estimate which action may the elves doing and compute amount of points to allow the action.
 
     Parameters:
     -----------
     data_ia: the whole database (dict)
-    build_formation: tells whether the situation requires to build the formation (bool)
     are_enemy: tells whether there are enemy in the surroundings (bool)
     where_enemies: position of the enemy's units (list)
 
