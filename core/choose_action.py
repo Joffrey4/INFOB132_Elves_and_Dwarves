@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def choose_action(data_map, connection):
+def choose_action(data_map, connection, data_ia):
     """Ask and execute the instruction given by the players to move or attack units.
 
     Parameters:
@@ -30,7 +30,7 @@ def choose_action(data_map, connection):
 
     # Tells whether IA or player's turn.
     if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
-        game_instruction = ia_action(data_map, player, enemy)
+        game_instruction = ia_action(data_map, data_ia)
         notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
