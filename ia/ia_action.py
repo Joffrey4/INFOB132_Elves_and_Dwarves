@@ -1,4 +1,4 @@
-# -*- coding: ascii -*-
+#  -*- coding: ascii -*-
 
 
 def ia_action(data_map, data_ia):
@@ -21,10 +21,12 @@ def ia_action(data_map, data_ia):
     """
     raw_commands = ia_reflexion(data_ia, data_map)
 
-    commands = ''
+    # Rewrite the command into a single string.
+    string_commands = ''
     for command in raw_commands:
+        string_commands += ('0' + str(command[0][0]))[-2:] + '_' + ('0' + str(command[0][1]))[-2:] + command[1] + ('0' + str(command[2][0]))[-2:] + '_' + ('0' + str(command[2][1]))[-2:] + '   '
 
+    return string_commands
 
-    return command
 
 
