@@ -20,7 +20,7 @@ def create_data_ia(map_size=7):
     data_ia = {'ia': {},
                'enemy': {},
                'main_turn': 1,
-               'attack_turn':0,
+               'attack_turn': 0,
                'map_size': map_size}
 
     for i in range(2):

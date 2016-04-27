@@ -24,6 +24,9 @@ def choose_action(data_map, connection):
     """
     player = 'player' + str((data_map['main_turn'] % 2) + 1)
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
+    if data_map['remote']:
+        player = 'player' + str(data_map['remote'])
+        enemy = 'player' + str(3 - data_map['remote'])
 
     # Tells whether IA or player's turn.
     if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
