@@ -920,7 +920,7 @@ def get_remote_orders(connection):
 #======================================================================================================================
 #======================================================================================================================
 
-def start_game(remote=1, player1='player 1', player2='player_2', map_size=7, file_name=None, sound=False, clear=False):
+def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_size=7, file_name=None, sound=False, clear=False):
     """Start the entire game.
     Parameters:
     -----------
@@ -948,7 +948,8 @@ def start_game(remote=1, player1='player 1', player2='player_2', map_size=7, fil
 
     # If we play versus another ia, connect to her.
     if remote:
-        connection = connect_to_player(remote)
+        IP = '138.48.160.1' + str(pc_id)
+        connection = connect_to_player(remote, IP)
         data_ia = create_data_ia(map_size)
     else:
         connection = None
@@ -1201,14 +1202,15 @@ def ia_reflexion(data_ia, data_map):
                     unit_targets.append(enemy_unit)
 
         # Find the weakest units.
-        target = unit_targets[0]
-        for enemy_unit in unit_targets:
-            if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
-                target = enemy_unit
+        if unit_targets:
+            target = unit_targets[0]
+            for enemy_unit in unit_targets:
+                if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
+                    target = enemy_unit
 
-        # Write the attack.
-        commands.append([ia_unit, ' -a-> ', target])
-        unit_has_attacked += 1
+            # Write the attack.
+            commands.append([ia_unit, ' -a-> ', target])
+            unit_has_attacked += 1
 
     # Find the weakest of all enemy's units.
     if not (unit_has_attacked and data_map['remote'] == 2):

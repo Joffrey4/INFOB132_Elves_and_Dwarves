@@ -40,14 +40,15 @@ def ia_reflexion(data_ia, data_map):
                     unit_targets.append(enemy_unit)
 
         # Find the weakest units.
-        target = unit_targets[0]
-        for enemy_unit in unit_targets:
-            if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
-                target = enemy_unit
+        if unit_targets:
+            target = unit_targets[0]
+            for enemy_unit in unit_targets:
+                if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
+                    target = enemy_unit
 
-        # Write the attack.
-        commands.append([ia_unit, ' -a-> ', target])
-        unit_has_attacked += 1
+            # Write the attack.
+            commands.append([ia_unit, ' -a-> ', target])
+            unit_has_attacked += 1
 
     # Find the weakest of all enemy's units.
     if not (unit_has_attacked and data_map['remote'] == 2):
