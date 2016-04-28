@@ -248,7 +248,7 @@ def wrap_stream(stream, convert, strip, autoreset, wrap):
     return stream
 
 winterm = None
-if windll is not None:
+if winterm is not None:
     winterm = WinTerm()
 
 
