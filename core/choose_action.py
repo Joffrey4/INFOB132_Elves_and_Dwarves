@@ -54,12 +54,12 @@ def choose_action(data_map, connection, data_ia):
     attack_counter = 0
     for i in range(len(list_action2)):
         if '-a->' in list_action2[i]:
-            data_map, attacked = attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
-                        (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
+            data_map, attacked, data_ia = attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+                        (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy, data_ia)
             attack_counter += attacked
         elif '-m->' in list_action2[i]:
-            data_map = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
-                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
+            data_map, data_ia = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy, data_ia)
 
     # Save if a player have attacked.
     if attack_counter:

@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
+def attack_unit(data_map, attacker_coord, target_coord, player, enemy, data_ia):
     """Attack an adverse cell and check whether it is a legal attack.
 
     Parameters:
@@ -41,6 +41,11 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
                 data_map[enemy][target_coord][2] -= damage[attacker_type]
                 if data_map[enemy][target_coord][2] <= 0:
                     del data_map[enemy][target_coord]
+
+                data_ia[enemy][target_coord][1] -= damage[attacker_type]
+                if data_ia[enemy][target_coord][1] <= 0:
+                    del data_ia[enemy][target_coord]
+
                 attacked = 1
 
-    return data_map, attacked
+    return data_map, attacked, data_ia

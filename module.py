@@ -1343,7 +1343,7 @@ def load_data_map():
 
     return pickle.load(open("save.p", "rb"))
 
-def move_unit(data_map, start_coord, end_coord, player, enemy):
+def move_unit(data_map, start_coord, end_coord, player, enemy, data_ia):
     """Move an unit from a cell to another cell. And check if the move is legal.
 
     Parameters:
@@ -1376,7 +1376,8 @@ def move_unit(data_map, start_coord, end_coord, player, enemy):
         if start_coord[0] - 1 <= end_coord[0] <= start_coord[0] + 1 and start_coord[1] - 1 <= end_coord[1] <= start_coord[1] + 1:
             if data_map[player][start_coord][0] == 'E' or (sum(start_coord) - 1 <= sum(end_coord) <= sum(start_coord) + 1):
                 data_map[player][end_coord] = data_map[player].pop(start_coord)
-    return data_map
+                data_ia[player][end_coord] = data_map[player].pop(start_coord)
+    return data_map, data_ia
 
 def is_not_game_ended(data_map):
     """Check if the game is allow to continue.
@@ -1602,15 +1603,16 @@ def choose_action(data_map, connection, data_ia):
         enemy = 'player' + str(3 - data_map['remote'])
 
     # Tells whether IA or player's turn.
+    # if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
     if data_map['main_turn'] % 2 == data_map['remote'] % 2 or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia, player)
-	if data_map['remote']:
-        	notify_remote_orders(connection, game_instruction)
+        if data_map['remote']:
+            notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
-            game_instruction = get_remote_orders(connection)
             player = 'player' + str(3 - data_map['remote'])
             enemy = 'player' + str(data_map['remote'])
+            game_instruction = get_remote_orders(connection)
         else:
             game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
@@ -1626,12 +1628,12 @@ def choose_action(data_map, connection, data_ia):
     attack_counter = 0
     for i in range(len(list_action2)):
         if '-a->' in list_action2[i]:
-            data_map, attacked = attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
-                        (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
+            data_map, attacked, data_ia = attack_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+                        (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy, data_ia)
             attack_counter += attacked
         elif '-m->' in list_action2[i]:
-            data_map = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
-                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy)
+            data_map, data_ia = move_unit(data_map, (int(list_action2[i][0][:2]), int(list_action2[i][0][3:])),
+                      (int(list_action2[i][2][:2]), int(list_action2[i][2][3:])), player, enemy, data_ia)
 
     # Save if a player have attacked.
     if attack_counter:
@@ -1642,7 +1644,7 @@ def choose_action(data_map, connection, data_ia):
 
     return data_map
 
-def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
+def attack_unit(data_map, attacker_coord, target_coord, player, enemy, data_ia):
     """Attack an adverse cell and check whether it is a legal attack.
 
     Parameters:
@@ -1682,7 +1684,12 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
                 data_map[enemy][target_coord][2] -= damage[attacker_type]
                 if data_map[enemy][target_coord][2] <= 0:
                     del data_map[enemy][target_coord]
+
+                data_ia[enemy][target_coord][1] -= damage[attacker_type]
+                if data_ia[enemy][target_coord][1] <= 0:
+                    del data_ia[enemy][target_coord]
+
                 attacked = 1
 
-    return data_map, attacked
+    return data_map, attacked, data_ia
 

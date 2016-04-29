@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def move_unit(data_map, start_coord, end_coord, player, enemy):
+def move_unit(data_map, start_coord, end_coord, player, enemy, data_ia):
     """Move an unit from a cell to another cell. And check if the move is legal.
 
     Parameters:
@@ -34,4 +34,5 @@ def move_unit(data_map, start_coord, end_coord, player, enemy):
         if start_coord[0] - 1 <= end_coord[0] <= start_coord[0] + 1 and start_coord[1] - 1 <= end_coord[1] <= start_coord[1] + 1:
             if data_map[player][start_coord][0] == 'E' or (sum(start_coord) - 1 <= sum(end_coord) <= sum(start_coord) + 1):
                 data_map[player][end_coord] = data_map[player].pop(start_coord)
-    return data_map
+                data_ia[player][end_coord] = data_map[player].pop(start_coord)
+    return data_map, data_ia
