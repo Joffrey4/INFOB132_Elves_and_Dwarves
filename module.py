@@ -1,5 +1,4 @@
 # coding=utf-8
-from colorama import Fore, Back, Style
 #import pyaudio
 #import wave
 #from IPython.display import clear_output
@@ -945,18 +944,17 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
         data_map = load_data_map()
     else:
         data_map = create_data_map(remote, map_size, player1, player2, clear)
+        data_ia = create_data_ia(map_size)
 
     # If we play versus another ia, connect to her.
     if remote:
         IP = '138.48.160.1' + str(pc_id)
         connection = connect_to_player(remote, IP)
-        data_ia = create_data_ia(map_size)
     else:
         connection = None
-        data_ia = None
 
     # Diplay introduction event and the map.
-    event_display(data_map, 'intro')
+    # event_display(data_map, 'intro')
 
     # Run de game turn by turn
     continue_game = True
@@ -1163,7 +1161,7 @@ def display_map(data_map, clear):
     for line in data_map['data_ui']:
         print line % data_cell
 
-def ia_reflexion(data_ia, data_map):
+def ia_reflexion(data_ia, data_map, player):
     """Brain of the Artificial Intelligence.
 
     Parameters:
@@ -1212,8 +1210,11 @@ def ia_reflexion(data_ia, data_map):
             commands.append([ia_unit, ' -a-> ', target])
             unit_has_attacked += 1
 
+            print commands
+
     # Find the weakest of all enemy's units.
-    if not (unit_has_attacked and data_map['remote'] == 2):
+    if not unit_has_attacked:
+        print 'bite'
         target_list = data_ia['enemy'].keys()
         target = target_list[0]
 
@@ -1225,9 +1226,10 @@ def ia_reflexion(data_ia, data_map):
         for ia_unit in data_ia['ia']:
             commands.append([ia_unit, ' -m-> ', target])
 
+    print commands
     return commands
 
-def ia_action(data_map, data_ia):
+def ia_action(data_map, data_ia, player):
     """The artificial intelligence of the game. Generate an instruction and return it.
 
     Parameters:
@@ -1245,7 +1247,7 @@ def ia_action(data_map, data_ia):
     specification: Laurent Emilie and Bienvenu Joffrey v. 1 (02/03/16)
     implementation: Bienvenu Joffrey and Jonathan Maroit v. 3 (21/03/16)
     """
-    raw_commands = ia_reflexion(data_ia, data_map)
+    raw_commands = ia_reflexion(data_ia, data_map, player)
 
     # Rewrite the command into a single string.
     string_commands = ''
@@ -1586,12 +1588,15 @@ def choose_action(data_map, connection, data_ia):
         enemy = 'player' + str(3 - data_map['remote'])
 
     # Tells whether IA or player's turn.
-    if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
-        game_instruction = ia_action(data_map, data_ia)
-        notify_remote_orders(connection, game_instruction)
+    if data_map['main_turn'] % 2 == data_map['remote'] % 2 or data_map[str(player + 'info')][1] == 'IA':
+        game_instruction = ia_action(data_map, data_ia, player)
+	if data_map['remote']:
+        	notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
             game_instruction = get_remote_orders(connection)
+            player = 'player' + str(3 - data_map['remote'])
+            enemy = 'player' + str(data_map['remote'])
         else:
             game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
 
@@ -1666,3 +1671,4 @@ def attack_unit(data_map, attacker_coord, target_coord, player, enemy):
                 attacked = 1
 
     return data_map, attacked
+

@@ -1,7 +1,7 @@
 #  -*- coding: ascii -*-
 
 
-def ia_action(data_map, data_ia):
+def ia_action(data_map, data_ia, player):
     """The artificial intelligence of the game. Generate an instruction and return it.
 
     Parameters:
@@ -19,7 +19,7 @@ def ia_action(data_map, data_ia):
     specification: Laurent Emilie and Bienvenu Joffrey v. 1 (02/03/16)
     implementation: Bienvenu Joffrey and Jonathan Maroit v. 3 (21/03/16)
     """
-    raw_commands = ia_reflexion(data_ia, data_map)
+    raw_commands = ia_reflexion(data_ia, data_map, player)
 
     # Rewrite the command into a single string.
     string_commands = ''

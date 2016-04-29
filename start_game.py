@@ -26,14 +26,13 @@ def start_game(remote=1, player1='player 1', player2='player_2', map_size=7, fil
         data_map = load_map()
     else:
         data_map = create_data_map(remote, map_size, player1, player2, clear)
+        data_ia = create_data_ia(map_size)
 
     # If we play versus another ia, connect to her.
     if remote:
         connection = connect_to_player(player_id)
-        data_ia = create_data_ia(map_size)
     else:
         connection = None
-        data_ia = None
 
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')

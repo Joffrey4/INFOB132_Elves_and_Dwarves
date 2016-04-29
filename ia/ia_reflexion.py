@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def ia_reflexion(data_ia, data_map):
+def ia_reflexion(data_ia, data_map, player):
     """Brain of the Artificial Intelligence.
 
     Parameters:
@@ -51,7 +51,7 @@ def ia_reflexion(data_ia, data_map):
             unit_has_attacked += 1
 
     # Find the weakest of all enemy's units.
-    if not (unit_has_attacked and data_map['remote'] == 2):
+    if not unit_has_attacked:
         target_list = data_ia['enemy'].keys()
         target = target_list[0]
 
