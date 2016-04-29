@@ -61,7 +61,7 @@ def ia_reflexion(data_ia, data_map, player):
                 if data_ia[enemy][enemy_unit][0] == 'D' or data_ia[enemy][enemy_unit][1] < data_ia[enemy][target][1]:
                     target = enemy_unit
 
-            target_cell = ia_unit
+            target_cell = [ia_unit[0], ia_unit[1]]
             # Move on Y axis
             if target and abs(ia_unit[1] - target[1]) > abs(ia_unit[0] - target[0]):
                 if ia_unit[1] > target[1]:
@@ -77,6 +77,6 @@ def ia_reflexion(data_ia, data_map, player):
 
             # Write the move
             if target_cell != ia_unit:
-                commands.append([ia_unit, ' -m-> ', target])
+                commands.append([ia_unit, ' -m-> ', target_cell])
 
     return commands
