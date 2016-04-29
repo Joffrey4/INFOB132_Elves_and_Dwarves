@@ -944,7 +944,7 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
         data_map = load_data_map()
     else:
         data_map = create_data_map(remote, map_size, player1, player2, clear)
-        data_ia = create_data_ia(map_size, remote))
+        data_ia = create_data_ia(map_size, remote)
 
     # If we play versus another ia, connect to her.
     if remote:
