@@ -1179,15 +1179,17 @@ def ia_reflexion(data_ia, data_map, player):
     specification: Bienvenu Joffrey & Laurent Emilie v.1 (20/04/16)
     implementation:
     """
+    ia = 'player' + str(data_ia['id'])
+    enemy = 'player' + str((data_ia['id'] % 2) + 1)
     commands = []
 
     unit_has_attacked = 0
-    for ia_unit in data_ia['ia']:
-        for enemy_unit in data_ia['enemy']:
+    for ia_unit in data_ia[ia]:
+        for enemy_unit in data_ia[enemy]:
 
             # Find each possible target for the Elves.
             unit_targets = []
-            if data_ia['ia'][ia_unit][0] == 'E':
+            if data_ia[ia][ia_unit][0] == 'E':
                 for i in range(2):
                     if (ia_unit[0] - (1 + i)) <= enemy_unit[0] <= (ia_unit[0] + (1 + i)) and (ia_unit[1] - (1 + i)) <= enemy_unit[1] <= (ia_unit[1] + (1 + i)):
                         # Add the unit to the target list.
@@ -1203,30 +1205,26 @@ def ia_reflexion(data_ia, data_map, player):
         if unit_targets:
             target = unit_targets[0]
             for enemy_unit in unit_targets:
-                if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
+                if data_ia[enemy][enemy_unit][0] == 'D' or data_ia[enemy][enemy_unit][1] < data_ia[enemy][target][1]:
                     target = enemy_unit
 
             # Write the attack.
             commands.append([ia_unit, ' -a-> ', target])
             unit_has_attacked += 1
 
-            print commands
-
     # Find the weakest of all enemy's units.
     if not unit_has_attacked:
-        print 'bite'
-        target_list = data_ia['enemy'].keys()
+        target_list = data_ia[enemy].keys()
         target = target_list[0]
 
-        for enemy_unit in data_ia['enemy']:
-            if data_ia['enemy'][enemy_unit][0] == 'D' or data_ia['enemy'][enemy_unit][1] < data_ia['enemy'][target][1]:
+        for enemy_unit in data_ia[enemy]:
+            if data_ia[enemy][enemy_unit][0] == 'D' or data_ia[enemy][enemy_unit][1] < data_ia[enemy][target][1]:
                 target = enemy_unit
 
         # Write the move
-        for ia_unit in data_ia['ia']:
+        for ia_unit in data_ia[ia]:
             commands.append([ia_unit, ' -m-> ', target])
 
-    print commands
     return commands
 
 def ia_action(data_map, data_ia, player):
@@ -1256,7 +1254,7 @@ def ia_action(data_map, data_ia, player):
 
     return string_commands
 
-def create_data_ia(map_size=7):
+def create_data_ia(map_size, id):
     """Create the ia database.
 
     Parameters:
@@ -1272,11 +1270,12 @@ def create_data_ia(map_size=7):
     specifications: Laurent Emilie v.1 (24/04/16)
     implementation: Laurent Emilie v.1 (24/04/16)
     """
-    data_ia = {'ia': {},
-               'enemy': {},
+    data_ia = {'player1': {},
+               'player2': {},
                'main_turn': 1,
                'attack_turn': 0,
-               'map_size': map_size}
+               'map_size': map_size,
+               'id': id}
 
     for i in range(2):
         for line in range(1, 4):
@@ -1293,9 +1292,9 @@ def create_data_ia(map_size=7):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
-                        data_ia['ia'][(x_pos, y_pos)] = [unit, life]
+                        data_ia['player1'][(x_pos, y_pos)] = [unit, life]
                     else:
-                        data_ia['enemy'][(x_pos, y_pos)] = [unit, life]
+                        data_ia['player2'][(x_pos, y_pos)] = [unit, life]
 
     return data_ia
 

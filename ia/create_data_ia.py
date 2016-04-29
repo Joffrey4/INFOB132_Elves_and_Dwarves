@@ -1,7 +1,7 @@
 # -*- coding: ascii -*-
 
 
-def create_data_ia(map_size=7):
+def create_data_ia(map_size, id):
     """Create the ia database.
 
     Parameters:
@@ -17,11 +17,12 @@ def create_data_ia(map_size=7):
     specifications: Laurent Emilie v.1 (24/04/16)
     implementation: Laurent Emilie v.1 (24/04/16)
     """
-    data_ia = {'ia': {},
-               'enemy': {},
+    data_ia = {'player1': {},
+               'player2': {},
                'main_turn': 1,
                'attack_turn': 0,
-               'map_size': map_size}
+               'map_size': map_size,
+               'id': id}
 
     for i in range(2):
         for line in range(1, 4):
@@ -38,8 +39,8 @@ def create_data_ia(map_size=7):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
-                        data_ia['ia'][(x_pos, y_pos)] = [unit, life]
+                        data_ia['player1'][(x_pos, y_pos)] = [unit, life]
                     else:
-                        data_ia['enemy'][(x_pos, y_pos)] = [unit, life]
+                        data_ia['player2'][(x_pos, y_pos)] = [unit, life]
 
     return data_ia
