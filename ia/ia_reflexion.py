@@ -63,13 +63,13 @@ def ia_reflexion(data_ia, data_map, player):
 
             target_cell = [ia_unit[0], ia_unit[1]]
             # Move on Y axis
-            if target and abs(ia_unit[1] - target[1]) > abs(ia_unit[0] - target[0]):
+            if target and abs(ia_unit[1] - target[1]) > abs(ia_unit[0] - target[0]) and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
                 if ia_unit[1] > target[1]:
                     target_cell[1] -= 1
                 else:
                     target_cell[1] += 1
             # Move on X axis
-            else:
+            elif target and abs(ia_unit[1] - target[1]) < abs(ia_unit[0] - target[0]) and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
                 if ia_unit[0] > target[0]:
                     target_cell[1] -= 1
                 else:

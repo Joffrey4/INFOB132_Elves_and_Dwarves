@@ -1223,13 +1223,13 @@ def ia_reflexion(data_ia, data_map, player):
 
             target_cell = [ia_unit[0], ia_unit[1]]
             # Move on Y axis
-            if target and abs(ia_unit[1] - target[1]) > abs(ia_unit[0] - target[0]):
+            if target and abs(ia_unit[1] - target[1]) > abs(ia_unit[0] - target[0]) and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
                 if ia_unit[1] > target[1]:
                     target_cell[1] -= 1
                 else:
                     target_cell[1] += 1
             # Move on X axis
-            else:
+            elif target and abs(ia_unit[1] - target[1]) < abs(ia_unit[0] - target[0]) and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
                 if ia_unit[0] > target[0]:
                     target_cell[1] -= 1
                 else:
@@ -1376,7 +1376,7 @@ def move_unit(data_map, start_coord, end_coord, player, enemy, data_ia):
         if start_coord[0] - 1 <= end_coord[0] <= start_coord[0] + 1 and start_coord[1] - 1 <= end_coord[1] <= start_coord[1] + 1:
             if data_map[player][start_coord][0] == 'E' or (sum(start_coord) - 1 <= sum(end_coord) <= sum(start_coord) + 1):
                 data_map[player][end_coord] = data_map[player].pop(start_coord)
-                data_ia[player][end_coord] = data_map[player].pop(start_coord)
+                data_ia[player][end_coord] = data_ia[player].pop(start_coord)
     return data_map, data_ia
 
 def is_not_game_ended(data_map):
