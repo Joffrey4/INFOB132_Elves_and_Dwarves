@@ -19,8 +19,8 @@ def ia_reflexion(data_ia, data_map, player):
     specification: Bienvenu Joffrey & Laurent Emilie v.1 (20/04/16)
     implementation:
     """
-    ia = 'player' + str((data_ia['id'] % 2) + 1)
-    enemy = 'player' + str(data_ia['id'])
+    ia = 'player' + str(data_map['remote'])
+    enemy = 'player' + str(3 - data_map['remote'])
     commands = []
 
     unit_has_attacked = 0
