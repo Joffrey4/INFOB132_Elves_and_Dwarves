@@ -29,12 +29,15 @@ def choose_action(data_map, connection, data_ia):
         enemy = 'player' + str(3 - data_map['remote'])
 
     # Tells whether IA or player's turn.
-    if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
+    # if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
+    if data_map['main_turn'] % 2 == data_map['remote'] % 2 or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia)
         if data_map['remote']:
             notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
+            player = 'player' + str(3 - data_map['remote'])
+            enemy = 'player' + str(data_map['remote'])
             game_instruction = get_remote_orders(connection)
         else:
             game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
