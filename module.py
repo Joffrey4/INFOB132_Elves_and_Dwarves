@@ -944,7 +944,7 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
         data_map = load_data_map()
     else:
         data_map = create_data_map(remote, map_size, player1, player2, clear)
-        data_ia = create_data_ia(map_size)
+        data_ia = create_data_ia(map_size, remote))
 
     # If we play versus another ia, connect to her.
     if remote:
@@ -1492,7 +1492,7 @@ def create_data_ui(data_map, clear):
 
     return data_ui
 
-def create_data_map(remote, map_size=7, name_player1='player1', name_player2='player2', clear=False):
+def create_data_map(remote, map_size=7, name_player1, name_player2, clear=False):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
@@ -1546,14 +1546,15 @@ def create_data_map(remote, map_size=7, name_player1='player1', name_player2='pl
                     data_map['player' + str(i + 1)][(x_pos, y_pos)] = [unit, player_data[i], life]
         data_map['player' + str(i + 1) + 'info'].extend([player_data[i], player_data[i + 2]])
 
-    # Randomize which player will start the game.
-    number = random.randint(1, 2)
-    if number == 1:
-        data_map['player1info'][1] = name_player1
-        data_map['player2info'][1] = name_player2
-    else:
-        data_map['player1info'][1] = name_player2
-        data_map['player2info'][1] = name_player1
+    if not remote:
+        # Randomize which player will start the game.
+        number = random.randint(1, 2)
+        if number == 1:
+            data_map['player1info'][1] = name_player1
+            data_map['player2info'][1] = name_player2
+        else:
+            data_map['player1info'][1] = name_player2
+            data_map['player2info'][1] = name_player1
 
     data_map['data_ui'] = create_data_ui(data_map, clear)
 

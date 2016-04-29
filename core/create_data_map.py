@@ -57,14 +57,15 @@ def create_data_map(remote, map_size=7, name_player1, name_player2, clear=False)
                     data_map['player' + str(i + 1)][(x_pos, y_pos)] = [unit, player_data[i], life]
         data_map['player' + str(i + 1) + 'info'].extend([player_data[i], player_data[i + 2]])
 
-    # Randomize which player will start the game.
-    number = random.randint(1, 2)
-    if number == 1:
-        data_map['player1info'][1] = name_player1
-        data_map['player2info'][1] = name_player2
-    else:
-        data_map['player1info'][1] = name_player2
-        data_map['player2info'][1] = name_player1
+    if not remote:
+        # Randomize which player will start the game.
+        number = random.randint(1, 2)
+        if number == 1:
+            data_map['player1info'][1] = name_player1
+            data_map['player2info'][1] = name_player2
+        else:
+            data_map['player1info'][1] = name_player2
+            data_map['player2info'][1] = name_player1
 
     data_map['data_ui'] = create_data_ui(data_map, clear)
 
