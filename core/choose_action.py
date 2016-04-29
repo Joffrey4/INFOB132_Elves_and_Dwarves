@@ -31,7 +31,8 @@ def choose_action(data_map, connection, data_ia):
     # Tells whether IA or player's turn.
     if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia)
-        notify_remote_orders(connection, game_instruction)
+        if data_map['remote']:
+            notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
             game_instruction = get_remote_orders(connection)
