@@ -43,8 +43,10 @@ def create_data_ia(map_size, id):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
+                        unit_id = (order_unit[if_left][(line,column)].index) + 1
                         data_ia['player1'][(x_pos, y_pos)] = [unit, life, unit_id]
                     else:
+                        unit_id = (order_unit[if_left][(line,column)].index) + 1
                         data_ia['player2'][(x_pos, y_pos)] = [unit, life, unit_id]
 
     return data_ia
