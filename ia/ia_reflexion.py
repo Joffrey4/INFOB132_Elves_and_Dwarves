@@ -10,13 +10,13 @@ def ia_reflexion(data_ia, data_map, player):
 
     Returns:
     --------
-    action_type_formation: actions with number of points for the group (dict)
-    action_type_elf: actions with number of points for each elf (dict)
-    action_type_dwarf: actions with number of points for each dwarf (dict)
+    data_ia: database for the ia (dict)
+    data_map: database of the whole game (dict)
+    player: tells which player is the ia (int)
 
     Versions:
     ---------
-    specification: Bienvenu Joffrey & Laurent Emilie v.1 (20/04/16)
+    specification: Bienvenu Joffrey & Laurent Emilie v.2 (28/04/16)
     implementation:
     """
     ia = 'player' + str(data_map['remote'])

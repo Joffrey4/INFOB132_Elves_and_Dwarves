@@ -7,6 +7,7 @@ def create_data_ia(map_size, id):
     Parameters:
     -----------
     map_size: the length of the board game, every unit add one unit to vertical axis and horizontal axis (int, optional)
+    id: tells which player is the ia (int)
 
     Returns:
     --------

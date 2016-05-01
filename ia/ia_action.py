@@ -7,7 +7,7 @@ def ia_action(data_map, data_ia, player):
     Parameters:
     -----------
     data_map: the whole database of the game (dict).
-    ia: the ia identifier ('player1' or 'player2', string).
+    data_ia: the ia identifier ('player1' or 'player2', string).
     player: the player identifier ('player1' or 'player2', string).
 
     Return:
