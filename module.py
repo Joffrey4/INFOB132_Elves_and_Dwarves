@@ -1170,18 +1170,18 @@ def ia_reflexion(data_ia, data_map, player):
 
     Returns:
     --------
-    action_type_formation: actions with number of points for the group (dict)
-    action_type_elf: actions with number of points for each elf (dict)
-    action_type_dwarf: actions with number of points for each dwarf (dict)
+    data_ia: database for the ia (dict)
+    data_map: database of the whole game (dict)
+    player: tells which player is the ia (int)
 
     Versions:
     ---------
-    specification: Bienvenu Joffrey & Laurent Emilie v.1 (20/04/16)
-    implementation:
+    specification: Bienvenu Joffrey & Laurent Emilie v.2 (28/04/16)
+    implementation: Bienvenu Joffrey & Laurent Emilie v.3 (01/0516)
     """
     ia = 'player' + str(data_map['remote'])
     enemy = 'player' + str(3 - data_map['remote'])
-    commands = []
+    commands = {}
 
     unit_has_attacked = 0
     for ia_unit in data_ia[ia]:
@@ -1237,7 +1237,7 @@ def ia_reflexion(data_ia, data_map, player):
 
             # Write the move
             if target_cell != ia_unit:
-                commands.append([ia_unit, ' -m-> ', target_cell])
+                commands[data_ia[ia][ia_unit][2]] = [ia_unit, ' -m-> ', target_cell]
 
     return commands
 
@@ -1247,7 +1247,7 @@ def ia_action(data_map, data_ia, player):
     Parameters:
     -----------
     data_map: the whole database of the game (dict).
-    ia: the ia identifier ('player1' or 'player2', string).
+    data_ia: the ia identifier ('player1' or 'player2', string).
     player: the player identifier ('player1' or 'player2', string).
 
     Return:
@@ -1257,15 +1257,14 @@ def ia_action(data_map, data_ia, player):
     Version:
     --------
     specification: Laurent Emilie and Bienvenu Joffrey v. 1 (02/03/16)
-    implementation: Bienvenu Joffrey and Jonathan Maroit v. 3 (21/03/16)
+    implementation: Bienvenu Joffrey and Jonathan Maroit & Laurent Emilie v.4 (01/05/16)
     """
     raw_commands = ia_reflexion(data_ia, data_map, player)
 
     # Rewrite the command into a single string.
     string_commands = ''
-    for command in raw_commands:
-        string_commands += ('0' + str(command[0][0]))[-2:] + '_' + ('0' + str(command[0][1]))[-2:] + command[1] + ('0' + str(command[2][0]))[-2:] + '_' + ('0' + str(command[2][1]))[-2:] + '   '
-
+    for key in range(1,9):
+        string_commands += ('0' + str(raw_commands[key][0][0]))[-2:] + '_' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_commands[key][1] + ('0' + str(raw_commands[key][2][0]))[-2:] + '_' + ('0' + str(raw_commands[key][2][1]))[-2:]
     return string_commands
 
 def create_data_ia(map_size, id):
@@ -1274,6 +1273,7 @@ def create_data_ia(map_size, id):
     Parameters:
     -----------
     map_size: the length of the board game, every unit add one unit to vertical axis and horizontal axis (int, optional)
+    id: tells which player is the ia (int)
 
     Returns:
     --------
@@ -1291,6 +1291,11 @@ def create_data_ia(map_size, id):
                'map_size': map_size,
                'id': id}
 
+
+    order_unit = {}
+    order_unit['if_left'] = [(2,3), (3,2), (1,3), (2,2), (3,1), (1,2), (2,1), (1,1)]
+    order_unit['if_right'] = [(map_size,map_size), (map_size,map_size - 2), (map_size,map_size - 1), (map_size - 2,map_size), (map_size - 1,map_size - 1), (map_size,map_size - 2), (map_size - 2,map_size - 1), (map_size - 1,map_size - 2)]
+
     for i in range(2):
         for line in range(1, 4):
             for column in range(1, 4):
@@ -1306,11 +1311,14 @@ def create_data_ia(map_size, id):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
-                        data_ia['player1'][(x_pos, y_pos)] = [unit, life]
+                        unit_id = (order_unit['if_left'].index((line,column))) + 1
+                        data_ia['player1'][(x_pos, y_pos)] = [unit, life, unit_id]
                     else:
-                        data_ia['player2'][(x_pos, y_pos)] = [unit, life]
+                        unit_id = (order_unit['if_right'].index((line,column))) + 1
+                        data_ia['player2'][(x_pos, y_pos)] = [unit, life, unit_id]
 
     return data_ia
+
 
 def save_data_map(data_map):
     """Load a saved game.
