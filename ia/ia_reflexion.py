@@ -17,7 +17,7 @@ def ia_reflexion(data_ia, data_map, player):
     Versions:
     ---------
     specification: Bienvenu Joffrey & Laurent Emilie v.2 (28/04/16)
-    implementation:
+    implementation: Bienvenu Joffrey & Laurent Emilie v.3 (01/0516)
     """
     ia = 'player' + str(data_map['remote'])
     enemy = 'player' + str(3 - data_map['remote'])
