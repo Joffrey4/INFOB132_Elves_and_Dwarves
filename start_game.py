@@ -36,6 +36,7 @@ def start_game(remote=1, player1='player 1', player2='player_2', map_size=7, fil
 
     # Diplay introduction event and the map.
     event_display(data_map, 'intro')
+    play_event(sound, player, player_name, 'intro')
 
     # Run de game turn by turn
     continue_game = True
