@@ -21,7 +21,7 @@ def ia_reflexion(data_ia, data_map, player):
     """
     ia = 'player' + str(data_map['remote'])
     enemy = 'player' + str(3 - data_map['remote'])
-    commands = []
+    commands = {}
 
     unit_has_attacked = 0
     for ia_unit in data_ia[ia]:
@@ -77,6 +77,6 @@ def ia_reflexion(data_ia, data_map, player):
 
             # Write the move
             if target_cell != ia_unit:
-                commands.append([ia_unit, ' -m-> ', target_cell])
+                commands[data_ia[ia][ia_unit][2]] = [ia_unit, ' -m-> ', target_cell]
 
     return commands
