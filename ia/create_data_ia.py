@@ -28,7 +28,8 @@ def create_data_ia(map_size, id):
 
     order_unit = {}
     order_unit['if_left'] = [(2,3), (3,2), (1,3), (2,2), (3,1), (1,2), (2,1), (1,1)]
-    order_unit['if_right'] = [(map_size,map_size), (map_size,map_size - 2), (map_size,map_size - 1), (map_size - 2,map_size), (map_size - 1,map_size - 1), (map_size,map_size - 2), (map_size - 2,map_size - 1), (map_size - 1,map_size - 2)]
+    order_unit['if_right'] = [(map_size -1, map_size -2), (map_size -2, map_size -1), (map_size, map_size -2), (map_size -1, map_size -1), (map_size -1, map_size -1), (map_size -2, map_size), (map_size, map_size-1), (map_size -1, map_size), (map_size, map_size)]
+
     print order_unit
 
     for i in range(2):
