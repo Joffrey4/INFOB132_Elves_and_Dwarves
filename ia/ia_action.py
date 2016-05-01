@@ -17,15 +17,14 @@ def ia_action(data_map, data_ia, player):
     Version:
     --------
     specification: Laurent Emilie and Bienvenu Joffrey v. 1 (02/03/16)
-    implementation: Bienvenu Joffrey and Jonathan Maroit v. 3 (21/03/16)
+    implementation: Bienvenu Joffrey and Jonathan Maroit & Laurent Emilie v.4 (01/05/16)
     """
     raw_commands = ia_reflexion(data_ia, data_map, player)
 
     # Rewrite the command into a single string.
     string_commands = ''
-    for command in raw_commands:
-        string_commands += ('0' + str(command[0][0]))[-2:] + '_' + ('0' + str(command[0][1]))[-2:] + command[1] + ('0' + str(command[2][0]))[-2:] + '_' + ('0' + str(command[2][1]))[-2:] + '   '
-
+    for key in raw_commands:
+        string_commands += ('0' + str(raw_commands[key][0][0])[-2:] + '_' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_command[key][1] + ('0' + str(raw_commands[key][2][0])[-2:] + '_' + ('0' + str(raw_commands[key][2][1]))[-2:]
     return string_commands
 
 
