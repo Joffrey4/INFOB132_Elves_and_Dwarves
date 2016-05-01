@@ -29,6 +29,7 @@ def create_data_ia(map_size, id):
     order_unit = {}
     order_unit['if_left'] = [(2,3), (3,2), (1,3), (2,2), (3,1), (1,2), (2,1), (1,1)]
     order_unit['if_right'] = [(map_size,map_size), (map_size,map_size - 2), (map_size,map_size - 1), (map_size - 2,map_size), (map_size - 1,map_size - 1), (map_size,map_size - 2), (map_size - 2,map_size - 1), (map_size - 1,map_size - 2)]
+    print order_unit
 
     for i in range(2):
         for line in range(1, 4):
@@ -45,10 +46,10 @@ def create_data_ia(map_size, id):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
-                        unit_id = (order_unit['if_left'].index((line,column))) + 1
+                        unit_id = (order_unit['if_left'].index((x_pos,y_pos))) + 1
                         data_ia['player1'][(x_pos, y_pos)] = [unit, life, unit_id]
                     else:
-                        unit_id = (order_unit['if_right'].index((line,column))) + 1
+                        unit_id = (order_unit['if_right'].index((x_pos,y_pos))) + 1
                         data_ia['player2'][(x_pos, y_pos)] = [unit, life, unit_id]
 
     return data_ia
