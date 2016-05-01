@@ -741,7 +741,7 @@ def get_IP():
     return socket.gethostbyname(socket.gethostname())
 
 
-def connect_to_player(player_id, remote_IP='127.0.0.1', verbose=False):
+def connect_to_player(player_id, remote_IP='25.68.218.220', verbose=False):
     """Initialise communication with remote player.
 
     Parameters
@@ -945,11 +945,12 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
     else:
         data_map = create_data_map(remote, map_size, player1, player2, clear)
         data_ia = create_data_ia(map_size, remote)
-
+    remote2 = False
     # If we play versus another ia, connect to her.
-    if remote:
-        IP = '138.48.160.1' + str(pc_id)
-        connection = connect_to_player(remote, IP)
+    if remote2:
+        #IP = '138.48.160.1' + str(pc_id)
+        connection = connect_to_player(remote, '127.0.0.1')
+        print 'connected'
     else:
         connection = None
 
@@ -965,7 +966,7 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
         continue_game, loser, winner = is_not_game_ended(data_map)
 
     # Once the game is finished, disconnect from the other player.
-    if remote:
+    if remote2:
         disconnect_from_player(connection)
 
     # Display the game-over event (versus IA).
@@ -1183,23 +1184,26 @@ def ia_reflexion(data_ia, data_map, player):
     enemy = 'player' + str(3 - data_map['remote'])
     commands = {}
 
-    unit_has_attacked = 0
+    new_positions = []
+    moved_units = []
+
     for ia_unit in data_ia[ia]:
+        unit_has_attacked = False
+        unit_targets = []
+
         for enemy_unit in data_ia[enemy]:
+            # Find each possible target for the Dwarves.
+            if data_ia[ia][ia_unit][0] == 'D':
+                if (ia_unit[0] - 1) <= enemy_unit[0] <= (ia_unit[0] + 1) and (ia_unit[1] - 1) <= enemy_unit[1] <= (ia_unit[1] + 1):
+                    # Add the unit to the target list.
+                    unit_targets.append(enemy_unit)
 
             # Find each possible target for the Elves - ATTACK
-            unit_targets = []
-            if data_ia[ia][ia_unit][0] == 'E':
+            else:
                 for i in range(2):
                     if (ia_unit[0] - (1 + i)) <= enemy_unit[0] <= (ia_unit[0] + (1 + i)) and (ia_unit[1] - (1 + i)) <= enemy_unit[1] <= (ia_unit[1] + (1 + i)):
                         # Add the unit to the target list.
                         unit_targets.append(enemy_unit)
-
-            # Find each possible target for the Dwarves.
-            else:
-                if (ia_unit[0] - 1) <= enemy_unit[0] <= (ia_unit[0] + 1) and (ia_unit[1] - 1) <= enemy_unit[1] <= (ia_unit[1] + 1):
-                    # Add the unit to the target list.
-                    unit_targets.append(enemy_unit)
 
         # Find the weakest units.
         if unit_targets:
@@ -1209,8 +1213,8 @@ def ia_reflexion(data_ia, data_map, player):
                     target = enemy_unit
 
             # Write the attack.
-            commands.append([ia_unit, ' -a-> ', target])
-            unit_has_attacked += 1
+            commands[data_ia[ia][ia_unit][2]] = [ia_unit, ' -a-> ', target]
+            unit_has_attacked = True
 
         # Find the weakest of all enemy's units - MOVE
         if not unit_has_attacked:
@@ -1229,15 +1233,45 @@ def ia_reflexion(data_ia, data_map, player):
                 else:
                     target_cell[1] += 1
             # Move on X axis
-            elif target and abs(ia_unit[1] - target[1]) < abs(ia_unit[0] - target[0]) and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
+            elif target and 1 <= ia_unit[0] <= data_map['map_size'] and 1 <= ia_unit[1] <= data_map['map_size']:
                 if ia_unit[0] > target[0]:
-                    target_cell[1] -= 1
+                    target_cell[0] -= 1
                 else:
-                    target_cell[1] += 1
+                    target_cell[0] += 1
+
+            new_target = False
+            # Check if he can move on the targeted position.
+            enemy_positions = data_ia[enemy].keys()
+            ia_positions = data_ia[ia].keys()
+            for units in moved_units:
+                del ia_positions[ia_positions.index(units)]
+
+            # If the units can't move, find another free cell.
+            if target_cell in (new_positions or enemy_positions or ia_positions):
+                new_target_cells = []
+                for line in range(target_cell[0] - 1, target_cell[0] + 2):
+                    for column in range(target_cell[1] - 1, target_cell[1] + 2):
+
+                        # Append the possible free cell to the list.
+                        if (line, column) not in (new_positions or enemy_positions or ia_positions):
+                            new_target_cells.append((line, column))
+
+                # Choose the nearest free cell.
+                if new_target_cells:
+                    new_target = new_target_cells[0]
+                    for cell in new_target_cells:
+                        if abs(ia_unit[0] - cell[0]) + abs(ia_unit[1] - cell[1]) < abs(ia_unit[0] - new_target[0]) + abs(ia_unit[1] - new_target[1]):
+                            new_target = new_target_cells[new_target_cells.index(cell)]
+
+            # Save the new target in the correct variable.
+            if new_target:
+                target_cell = new_target
 
             # Write the move
             if target_cell != ia_unit:
                 commands[data_ia[ia][ia_unit][2]] = [ia_unit, ' -m-> ', target_cell]
+                new_positions.append(target_cell)
+                moved_units.append(ia_unit)
 
     return commands
 
@@ -1263,9 +1297,11 @@ def ia_action(data_map, data_ia, player):
 
     # Rewrite the command into a single string.
     string_commands = ''
-    for key in range(1,9):
-        string_commands += ('0' + str(raw_commands[key][0][0]))[-2:] + '_' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_commands[key][1] + ('0' + str(raw_commands[key][2][0]))[-2:] + '_' + ('0' + str(raw_commands[key][2][1]))[-2:]
+    for key in raw_commands:
+        string_commands += ('0' + str(raw_commands[key][0][0]))[-2:] + '_' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_commands[key][1] + ('0' + str(raw_commands[key][2][0]))[-2:] + '_' + ('0' + str(raw_commands[key][2][1]))[-2:] + '   '
+    print string_commands
     return string_commands
+
 
 def create_data_ia(map_size, id):
     """Create the ia database.
@@ -1294,7 +1330,9 @@ def create_data_ia(map_size, id):
 
     order_unit = {}
     order_unit['if_left'] = [(2,3), (3,2), (1,3), (2,2), (3,1), (1,2), (2,1), (1,1)]
-    order_unit['if_right'] = [(map_size,map_size), (map_size,map_size - 2), (map_size,map_size - 1), (map_size - 2,map_size), (map_size - 1,map_size - 1), (map_size,map_size - 2), (map_size - 2,map_size - 1), (map_size - 1,map_size - 2)]
+    order_unit['if_right'] = [(map_size -1, map_size -2), (map_size -2, map_size -1), (map_size, map_size -2), (map_size -1, map_size -1), (map_size -1, map_size -1), (map_size -2, map_size), (map_size, map_size-1), (map_size -1, map_size), (map_size, map_size)]
+
+    print order_unit
 
     for i in range(2):
         for line in range(1, 4):
@@ -1311,10 +1349,10 @@ def create_data_ia(map_size, id):
                     y_pos = abs(i * map_size - column + i)
 
                     if i == 0:
-                        unit_id = (order_unit['if_left'].index((line,column))) + 1
+                        unit_id = (order_unit['if_left'].index((x_pos,y_pos))) + 1
                         data_ia['player1'][(x_pos, y_pos)] = [unit, life, unit_id]
                     else:
-                        unit_id = (order_unit['if_right'].index((line,column))) + 1
+                        unit_id = (order_unit['if_right'].index((x_pos,y_pos))) + 1
                         data_ia['player2'][(x_pos, y_pos)] = [unit, life, unit_id]
 
     return data_ia
@@ -1614,8 +1652,8 @@ def choose_action(data_map, connection, data_ia):
     # if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
     if data_map['main_turn'] % 2 == data_map['remote'] % 2 or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia, player)
-        if data_map['remote']:
-            notify_remote_orders(connection, game_instruction)
+        #if data_map['remote']:
+        #    notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
             player = 'player' + str(3 - data_map['remote'])
