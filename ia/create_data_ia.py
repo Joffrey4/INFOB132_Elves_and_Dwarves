@@ -2,7 +2,7 @@
 
 
 def create_data_ia(map_size, id):
-    """Create the ia database.
+    """Create the ia database
 
     Parameters:
     -----------
