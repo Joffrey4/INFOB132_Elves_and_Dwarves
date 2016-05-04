@@ -1068,7 +1068,7 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
     ia_id =  3 - remote
 
     # Creation of the database or load it.
-    data_map = create_data_map(remote, map_size, player1, player2, clear, enemy_id, ia_id)
+    data_map = create_data_map(remote, map_size, player1, player2, clear, enemy_id, ia_id, remote)
     data_ia = create_data_ia(map_size, enemy_id, ia_id)
     # If we play versus another ia, connect to her.
     if remote:
@@ -1704,7 +1704,7 @@ def create_data_ui(data_map, clear):
     return data_ui
 
 
-def create_data_map(remote, map_size, name_player1, name_player2, clear, enemy_id, ia_id):
+def create_data_map(remote, map_size, name_player1, name_player2, clear, enemy_id, ia_id, remote):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
@@ -1738,7 +1738,8 @@ def create_data_map(remote, map_size, name_player1, name_player2, clear, enemy_i
                 'attack_turn': 0,
                 'map_size': map_size,
                 'enemy_id': enemy_id,
-                'ia_id': ia_id}
+                'ia_id': ia_id,
+                'remote': remote}
 
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
@@ -1801,7 +1802,7 @@ def choose_action(data_map, connection, data_ia):
         enemy = 'player' + str(data_map['enemy_id'])
 
     # Tells whether IA or player's turn.
-    if data_map['main_turn'] % 2 == (3-data_map['remote'] % 2) or data_map[str(player + 'info')][1] == 'IA':
+    if data_map['main_turn'] % 2 == data_map['ia_id'] or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia, player)
         if data_map['remote']:
             notify_remote_orders(connection, game_instruction)
