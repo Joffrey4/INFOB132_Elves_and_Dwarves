@@ -1,1130 +1,11 @@
 # coding=utf-8
+import pyaudio
 import wave
 import time
 import random
 
 import pickle
 import socket
-# ======================================PYAUDIO & WAVE=============================================================
-# PyAudio : Python Bindings for PortAudio.
-
-# Copyright (c) 2006 Hubert Pham
-
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-"""
-PyAudio provides Python bindings for PortAudio, the cross-platform
-audio I/O library. With PyAudio, you can easily use Python to play and
-record audio on a variety of platforms.  PyAudio is inspired by:
-
-* pyPortAudio/fastaudio: Python bindings for PortAudio v18 API.
-* tkSnack: cross-platform sound toolkit for Tcl/Tk and Python.
-
-.. include:: ../sphinx/examples.rst
-
-Overview
---------
-
-**Classes**
-  :py:class:`PyAudio`, :py:class:`Stream`
-
-.. only:: pamac
-
-   **Host Specific Classes**
-     :py:class:`PaMacCoreStreamInfo`
-
-**Stream Conversion Convenience Functions**
-  :py:func:`get_sample_size`, :py:func:`get_format_from_width`
-
-**PortAudio version**
-  :py:func:`get_portaudio_version`, :py:func:`get_portaudio_version_text`
-
-.. |PaSampleFormat| replace:: :ref:`PortAudio Sample Format <PaSampleFormat>`
-.. _PaSampleFormat:
-
-**Portaudio Sample Formats**
-  :py:data:`paFloat32`, :py:data:`paInt32`, :py:data:`paInt24`,
-  :py:data:`paInt16`, :py:data:`paInt8`, :py:data:`paUInt8`,
-  :py:data:`paCustomFormat`
-
-.. |PaHostAPI| replace:: :ref:`PortAudio Host API <PaHostAPI>`
-.. _PaHostAPI:
-
-**PortAudio Host APIs**
-  :py:data:`paInDevelopment`, :py:data:`paDirectSound`, :py:data:`paMME`,
-  :py:data:`paASIO`, :py:data:`paSoundManager`, :py:data:`paCoreAudio`,
-  :py:data:`paOSS`, :py:data:`paALSA`, :py:data:`paAL`, :py:data:`paBeOS`,
-  :py:data:`paWDMKS`, :py:data:`paJACK`, :py:data:`paWASAPI`,
-  :py:data:`paNoDevice`
-
-.. |PaErrorCode| replace:: :ref:`PortAudio Error Code <PaErrorCode>`
-.. _PaErrorCode:
-
-**PortAudio Error Codes**
-  :py:data:`paNoError`, :py:data:`paNotInitialized`,
-  :py:data:`paUnanticipatedHostError`, :py:data:`paInvalidChannelCount`,
-  :py:data:`paInvalidSampleRate`, :py:data:`paInvalidDevice`,
-  :py:data:`paInvalidFlag`, :py:data:`paSampleFormatNotSupported`,
-  :py:data:`paBadIODeviceCombination`, :py:data:`paInsufficientMemory`,
-  :py:data:`paBufferTooBig`, :py:data:`paBufferTooSmall`,
-  :py:data:`paNullCallback`, :py:data:`paBadStreamPtr`,
-  :py:data:`paTimedOut`, :py:data:`paInternalError`,
-  :py:data:`paDeviceUnavailable`,
-  :py:data:`paIncompatibleHostApiSpecificStreamInfo`,
-  :py:data:`paStreamIsStopped`, :py:data:`paStreamIsNotStopped`,
-  :py:data:`paInputOverflowed`, :py:data:`paOutputUnderflowed`,
-  :py:data:`paHostApiNotFound`, :py:data:`paInvalidHostApi`,
-  :py:data:`paCanNotReadFromACallbackStream`,
-  :py:data:`paCanNotWriteToACallbackStream`,
-  :py:data:`paCanNotReadFromAnOutputOnlyStream`,
-  :py:data:`paCanNotWriteToAnInputOnlyStream`,
-  :py:data:`paIncompatibleStreamHostApi`
-
-.. |PaCallbackReturnCodes| replace:: :ref:`PortAudio Callback Return Code <PaCallbackReturnCodes>`
-.. _PaCallbackReturnCodes:
-
-**PortAudio Callback Return Codes**
-  :py:data:`paContinue`, :py:data:`paComplete`, :py:data:`paAbort`
-
-.. |PaCallbackFlags| replace:: :ref:`PortAutio Callback Flag <PaCallbackFlags>`
-.. _PaCallbackFlags:
-
-**PortAudio Callback Flags**
-  :py:data:`paInputUnderflow`, :py:data:`paInputOverflow`,
-  :py:data:`paOutputUnderflow`, :py:data:`paOutputOverflow`,
-  :py:data:`paPrimingOutput`
-"""
-
-__author__ = "Hubert Pham"
-__version__ = "0.2.9"
-__docformat__ = "restructuredtext en"
-
-import sys
-
-# attempt to import PortAudio
-try:
-    import _portaudio as pa
-except ImportError:
-    print("Could not import the PyAudio C module '_portaudio'.")
-    raise
-
-############################################################
-# GLOBALS
-############################################################
-
-##### PaSampleFormat Sample Formats #####
-
-paFloat32      = pa.paFloat32      #: 32 bit float
-paInt32        = pa.paInt32        #: 32 bit int
-paInt24        = pa.paInt24        #: 24 bit int
-paInt16        = pa.paInt16        #: 16 bit int
-paInt8         = pa.paInt8         #: 8 bit int
-paUInt8        = pa.paUInt8        #: 8 bit unsigned int
-paCustomFormat = pa.paCustomFormat #: a custom data format
-
-###### HostAPI TypeId #####
-
-paInDevelopment = pa.paInDevelopment #: Still in development
-paDirectSound   = pa.paDirectSound   #: DirectSound (Windows only)
-paMME           = pa.paMME           #: Multimedia Extension (Windows only)
-paASIO          = pa.paASIO          #: Steinberg Audio Stream Input/Output
-paSoundManager  = pa.paSoundManager  #: SoundManager (OSX only)
-paCoreAudio     = pa.paCoreAudio     #: CoreAudio (OSX only)
-paOSS           = pa.paOSS           #: Open Sound System (Linux only)
-paALSA          = pa.paALSA          #: Advanced Linux Sound Architecture (Linux only)
-paAL            = pa.paAL            #: Open Audio Library
-paBeOS          = pa.paBeOS          #: BeOS Sound System
-paWDMKS         = pa.paWDMKS         #: Windows Driver Model (Windows only)
-paJACK          = pa.paJACK          #: JACK Audio Connection Kit
-paWASAPI        = pa.paWASAPI        #: Windows Vista Audio stack architecture
-paNoDevice      = pa.paNoDevice      #: Not actually an audio device
-
-###### portaudio error codes #####
-
-paNoError                               = pa.paNoError
-paNotInitialized                        = pa.paNotInitialized
-paUnanticipatedHostError                = pa.paUnanticipatedHostError
-paInvalidChannelCount                   = pa.paInvalidChannelCount
-paInvalidSampleRate                     = pa.paInvalidSampleRate
-paInvalidDevice                         = pa.paInvalidDevice
-paInvalidFlag                           = pa.paInvalidFlag
-paSampleFormatNotSupported              = pa.paSampleFormatNotSupported
-paBadIODeviceCombination                = pa.paBadIODeviceCombination
-paInsufficientMemory                    = pa.paInsufficientMemory
-paBufferTooBig                          = pa.paBufferTooBig
-paBufferTooSmall                        = pa.paBufferTooSmall
-paNullCallback                          = pa.paNullCallback
-paBadStreamPtr                          = pa.paBadStreamPtr
-paTimedOut                              = pa.paTimedOut
-paInternalError                         = pa.paInternalError
-paDeviceUnavailable                     = pa.paDeviceUnavailable
-paIncompatibleHostApiSpecificStreamInfo = pa.paIncompatibleHostApiSpecificStreamInfo
-paStreamIsStopped                       = pa.paStreamIsStopped
-paStreamIsNotStopped                    = pa.paStreamIsNotStopped
-paInputOverflowed                       = pa.paInputOverflowed
-paOutputUnderflowed                     = pa.paOutputUnderflowed
-paHostApiNotFound                       = pa.paHostApiNotFound
-paInvalidHostApi                        = pa.paInvalidHostApi
-paCanNotReadFromACallbackStream         = pa.paCanNotReadFromACallbackStream
-paCanNotWriteToACallbackStream          = pa.paCanNotWriteToACallbackStream
-paCanNotReadFromAnOutputOnlyStream      = pa.paCanNotReadFromAnOutputOnlyStream
-paCanNotWriteToAnInputOnlyStream        = pa.paCanNotWriteToAnInputOnlyStream
-paIncompatibleStreamHostApi             = pa.paIncompatibleStreamHostApi
-
-###### portaudio callback return codes ######
-
-paContinue = pa.paContinue #: There is more audio data to come
-paComplete = pa.paComplete #: This was the last block of audio data
-paAbort    = pa.paAbort    #: An error ocurred, stop playback/recording
-
-###### portaudio callback flags ######
-
-paInputUnderflow  = pa.paInputUnderflow  #: Buffer underflow in input
-paInputOverflow   = pa.paInputOverflow   #: Buffer overflow in input
-paOutputUnderflow = pa.paOutputUnderflow #: Buffer underflow in output
-paOutputOverflow  = pa.paOutputOverflow  #: Buffer overflow in output
-paPrimingOutput   = pa.paPrimingOutput   #: Just priming, not playing yet
-
-############################################################
-# Convenience Functions
-############################################################
-
-def get_sample_size(format):
-    """
-    Returns the size (in bytes) for the specified
-    sample *format*.
-
-    :param format: A |PaSampleFormat| constant.
-    :raises ValueError: on invalid specified `format`.
-    :rtype: integer
-    """
-
-    return pa.get_sample_size(format)
-
-def get_format_from_width(width, unsigned=True):
-    """
-    Returns a PortAudio format constant for the specified *width*.
-
-    :param width: The desired sample width in bytes (1, 2, 3, or 4)
-    :param unsigned: For 1 byte width, specifies signed or unsigned format.
-
-    :raises ValueError: when invalid *width*
-    :rtype: A |PaSampleFormat| constant
-    """
-
-    if width == 1:
-        if unsigned:
-            return paUInt8
-        else:
-            return paInt8
-    elif width == 2:
-        return paInt16
-    elif width == 3:
-        return paInt24
-    elif width == 4:
-        return paFloat32
-    else:
-        raise ValueError("Invalid width: %d" % width)
-
-
-############################################################
-# Versioning
-############################################################
-
-def get_portaudio_version():
-    """
-    Returns portaudio version.
-
-    :rtype: string
-    """
-
-    return pa.get_version()
-
-def get_portaudio_version_text():
-    """
-    Returns PortAudio version as a text string.
-
-    :rtype: string
-    """
-
-    return pa.get_version_text()
-
-############################################################
-# Wrapper around _portaudio Stream (Internal)
-############################################################
-
-# Note: See PyAudio class below for main export.
-
-class Stream:
-    """
-    PortAudio Stream Wrapper. Use :py:func:`PyAudio.open` to make a new
-    :py:class:`Stream`.
-
-    **Opening and Closing**
-      :py:func:`__init__`, :py:func:`close`
-
-    **Stream Info**
-      :py:func:`get_input_latency`, :py:func:`get_output_latency`,
-      :py:func:`get_time`, :py:func:`get_cpu_load`
-
-    **Stream Management**
-      :py:func:`start_stream`, :py:func:`stop_stream`, :py:func:`is_active`,
-      :py:func:`is_stopped`
-
-    **Input Output**
-      :py:func:`write`, :py:func:`read`, :py:func:`get_read_available`,
-      :py:func:`get_write_available`
-    """
-
-    def __init__(self,
-                 PA_manager,
-                 rate,
-                 channels,
-                 format,
-                 input=False,
-                 output=False,
-                 input_device_index=None,
-                 output_device_index=None,
-                 frames_per_buffer=1024,
-                 start=True,
-                 input_host_api_specific_stream_info=None,
-                 output_host_api_specific_stream_info=None,
-                 stream_callback=None):
-        """
-        Initialize a stream; this should be called by
-        :py:func:`PyAudio.open`. A stream can either be input, output,
-        or both.
-
-        :param PA_manager: A reference to the managing :py:class:`PyAudio`
-            instance
-        :param rate: Sampling rate
-        :param channels: Number of channels
-        :param format: Sampling size and format. See |PaSampleFormat|.
-        :param input: Specifies whether this is an input stream.
-            Defaults to ``False``.
-        :param output: Specifies whether this is an output stream.
-            Defaults to ``False``.
-        :param input_device_index: Index of Input Device to use.
-            Unspecified (or ``None``) uses default device.
-            Ignored if `input` is ``False``.
-        :param output_device_index:
-            Index of Output Device to use.
-            Unspecified (or ``None``) uses the default device.
-            Ignored if `output` is ``False``.
-        :param frames_per_buffer: Specifies the number of frames per buffer.
-        :param start: Start the stream running immediately.
-            Defaults to ``True``. In general, there is no reason to set
-            this to ``False``.
-        :param input_host_api_specific_stream_info: Specifies a host API
-            specific stream information data structure for input.
-
-            .. only:: pamac
-
-               See :py:class:`PaMacCoreStreamInfo`.
-
-        :param output_host_api_specific_stream_info: Specifies a host API
-            specific stream information data structure for output.
-
-            .. only:: pamac
-
-               See :py:class:`PaMacCoreStreamInfo`.
-
-        :param stream_callback: Specifies a callback function for
-            *non-blocking* (callback) operation.  Default is
-            ``None``, which indicates *blocking* operation (i.e.,
-            :py:func:`Stream.read` and :py:func:`Stream.write`).  To use
-            non-blocking operation, specify a callback that conforms
-            to the following signature:
-
-            .. code-block:: python
-
-               callback(in_data,      # recorded data if input=True; else None
-                        frame_count,  # number of frames
-                        time_info,    # dictionary
-                        status_flags) # PaCallbackFlags
-
-            ``time_info`` is a dictionary with the following keys:
-            ``input_buffer_adc_time``, ``current_time``, and
-            ``output_buffer_dac_time``; see the PortAudio
-            documentation for their meanings.  ``status_flags`` is one
-            of |PaCallbackFlags|.
-
-            The callback must return a tuple:
-
-            .. code-block:: python
-
-                (out_data, flag)
-
-            ``out_data`` is a byte array whose length should be the
-            (``frame_count * channels * bytes-per-channel``) if
-            ``output=True`` or ``None`` if ``output=False``.  ``flag``
-            must be either :py:data:`paContinue`, :py:data:`paComplete` or
-            :py:data:`paAbort` (one of |PaCallbackReturnCodes|).
-            When ``output=True`` and ``out_data`` does not contain at
-            least ``frame_count`` frames, :py:data:`paComplete` is
-            assumed for ``flag``.
-
-            **Note:** ``stream_callback`` is called in a separate
-            thread (from the main thread).  Exceptions that occur in
-            the ``stream_callback`` will:
-
-            1. print a traceback on standard error to aid debugging,
-            2. queue the exception to be thrown (at some point) in
-               the main thread, and
-            3. return `paAbort` to PortAudio to stop the stream.
-
-            **Note:** Do not call :py:func:`Stream.read` or
-            :py:func:`Stream.write` if using non-blocking operation.
-
-            **See:** PortAudio's callback signature for additional
-            details: http://portaudio.com/docs/v19-doxydocs/portaudio_8h.html#a8a60fb2a5ec9cbade3f54a9c978e2710
-
-        :raise ValueError: Neither input nor output are set True.
-        """
-
-        # no stupidity allowed
-        if not (input or output):
-            raise ValueError("Must specify an input or output " + "stream.")
-
-        # remember parent
-        self._parent = PA_manager
-
-        # remember if we are an: input, output (or both)
-        self._is_input = input
-        self._is_output = output
-
-        # are we running?
-        self._is_running = start
-
-        # remember some parameters
-        self._rate = rate
-        self._channels = channels
-        self._format = format
-        self._frames_per_buffer = frames_per_buffer
-
-        arguments = {
-            'rate' : rate,
-            'channels' : channels,
-            'format' : format,
-            'input' : input,
-            'output' : output,
-            'input_device_index' : input_device_index,
-            'output_device_index' : output_device_index,
-            'frames_per_buffer' : frames_per_buffer}
-
-        if input_host_api_specific_stream_info:
-            _l = input_host_api_specific_stream_info
-            arguments[
-                'input_host_api_specific_stream_info'
-                ] = _l._get_host_api_stream_object()
-
-        if output_host_api_specific_stream_info:
-            _l = output_host_api_specific_stream_info
-            arguments[
-                'output_host_api_specific_stream_info'
-                ] = _l._get_host_api_stream_object()
-
-        if stream_callback:
-            arguments['stream_callback'] = stream_callback
-
-        # calling pa.open returns a stream object
-        self._stream = pa.open(**arguments)
-
-        self._input_latency = self._stream.inputLatency
-        self._output_latency = self._stream.outputLatency
-
-        if self._is_running:
-            pa.start_stream(self._stream)
-
-    def close(self):
-        """ Close the stream """
-
-        pa.close(self._stream)
-
-        self._is_running = False
-
-        self._parent._remove_stream(self)
-
-
-    ############################################################
-    # Stream Info
-    ############################################################
-
-    def get_input_latency(self):
-        """
-        Return the input latency.
-
-        :rtype: float
-        """
-
-        return self._stream.inputLatency
-
-    def get_output_latency(self):
-        """
-        Return the input latency.
-
-        :rtype: float
-        """
-
-        return self._stream.outputLatency
-
-    def get_time(self):
-        """
-        Return stream time.
-
-        :rtype: float
-        """
-
-        return pa.get_stream_time(self._stream)
-
-    def get_cpu_load(self):
-        """
-        Return the CPU load.  This is always 0.0 for the
-        blocking API.
-
-        :rtype: float
-        """
-
-        return pa.get_stream_cpu_load(self._stream)
-
-
-    ############################################################
-    # Stream Management
-    ############################################################
-
-    def start_stream(self):
-        """ Start the stream. """
-
-        if self._is_running:
-            return
-
-        pa.start_stream(self._stream)
-        self._is_running = True
-
-    def stop_stream(self):
-        """
-        Stop the stream. Once the stream is stopped, one may not call
-        write or read.  Call :py:func:`start_stream` to resume the
-        stream.
-        """
-
-        if not self._is_running:
-            return
-
-        pa.stop_stream(self._stream)
-        self._is_running = False
-
-    def is_active(self):
-        """
-        Returns whether the stream is active.
-
-        :rtype: bool
-        """
-
-        return pa.is_stream_active(self._stream)
-
-    def is_stopped(self):
-        """
-        Returns whether the stream is stopped.
-
-        :rtype: bool
-        """
-
-        return pa.is_stream_stopped(self._stream)
-
-
-    ############################################################
-    # Reading/Writing
-    ############################################################
-
-    def write(self, frames, num_frames=None,
-              exception_on_underflow=False):
-
-        """
-        Write samples to the stream.  Do not call when using
-        *non-blocking* mode.
-
-        :param frames:
-           The frames of data.
-        :param num_frames:
-           The number of frames to write.
-           Defaults to None, in which this value will be
-           automatically computed.
-        :param exception_on_underflow:
-           Specifies whether an IOError exception should be thrown
-           (or silently ignored) on buffer underflow. Defaults
-           to False for improved performance, especially on
-           slower platforms.
-
-        :raises IOError: if the stream is not an output stream
-           or if the write operation was unsuccessful.
-
-        :rtype: `None`
-        """
-
-        if not self._is_output:
-            raise IOError("Not output stream",
-                          paCanNotWriteToAnInputOnlyStream)
-
-        if num_frames == None:
-            # determine how many frames to read
-            width = get_sample_size(self._format)
-            num_frames = int(len(frames) / (self._channels * width))
-            #print len(frames), self._channels, self._width, num_frames
-
-        pa.write_stream(self._stream, frames, num_frames,
-                        exception_on_underflow)
-
-
-    def read(self, num_frames, exception_on_overflow=True):
-        """
-        Read samples from the stream.  Do not call when using
-        *non-blocking* mode.
-
-        :param num_frames: The number of frames to read.
-        :param exception_on_overflow:
-           Specifies whether an IOError exception should be thrown
-           (or silently ignored) on input buffer overflow. Defaults
-           to True.
-        :raises IOError: if stream is not an input stream
-          or if the read operation was unsuccessful.
-        :rtype: string
-        """
-
-        if not self._is_input:
-            raise IOError("Not input stream",
-                          paCanNotReadFromAnOutputOnlyStream)
-
-        return pa.read_stream(self._stream, num_frames, exception_on_overflow)
-
-    def get_read_available(self):
-        """
-        Return the number of frames that can be read without waiting.
-
-        :rtype: integer
-        """
-
-        return pa.get_stream_read_available(self._stream)
-
-
-    def get_write_available(self):
-        """
-        Return the number of frames that can be written without
-        waiting.
-
-        :rtype: integer
-
-        """
-
-        return pa.get_stream_write_available(self._stream)
-
-
-
-############################################################
-# Main Export
-############################################################
-
-class PyAudio:
-
-    """
-    Python interface to PortAudio. Provides methods to:
-     - initialize and terminate PortAudio
-     - open and close streams
-     - query and inspect the available PortAudio Host APIs
-     - query and inspect the available PortAudio audio
-       devices
-
-    Use this class to open and close streams.
-
-    **Stream Management**
-      :py:func:`open`, :py:func:`close`
-
-    **Host API**
-      :py:func:`get_host_api_count`, :py:func:`get_default_host_api_info`,
-      :py:func:`get_host_api_info_by_type`,
-      :py:func:`get_host_api_info_by_index`,
-      :py:func:`get_device_info_by_host_api_device_index`
-
-    **Device API**
-      :py:func:`get_device_count`, :py:func:`is_format_supported`,
-      :py:func:`get_default_input_device_info`,
-      :py:func:`get_default_output_device_info`,
-      :py:func:`get_device_info_by_index`
-
-    **Stream Format Conversion**
-      :py:func:`get_sample_size`, :py:func:`get_format_from_width`
-
-    **Details**
-    """
-
-    ############################################################
-    # Initialization and Termination
-    ############################################################
-
-    def __init__(self):
-        """Initialize PortAudio."""
-
-        pa.initialize()
-        self._streams = set()
-
-    def terminate(self):
-        """
-        Terminate PortAudio.
-
-        :attention: Be sure to call this method for every instance of
-          this object to release PortAudio resources.
-        """
-
-        for stream in self._streams.copy():
-            stream.close()
-
-        self._streams = set()
-
-        pa.terminate()
-
-
-    ############################################################
-    # Stream Format
-    ############################################################
-
-    def get_sample_size(self, format):
-        """
-        Returns the size (in bytes) for the specified
-        sample `format` (a |PaSampleFormat| constant).
-
-        :param format: A |PaSampleFormat| constant.
-        :raises ValueError: Invalid specified `format`.
-        :rtype: integer
-        """
-
-        return pa.get_sample_size(format)
-
-    def get_format_from_width(self, width, unsigned=True):
-        """
-        Returns a PortAudio format constant for the specified `width`.
-
-        :param width: The desired sample width in bytes (1, 2, 3, or 4)
-        :param unsigned: For 1 byte width, specifies signed or unsigned format.
-
-        :raises ValueError: for invalid `width`
-        :rtype: A |PaSampleFormat| constant.
-        """
-
-        if width == 1:
-            if unsigned:
-                return paUInt8
-            else:
-                return paInt8
-        elif width == 2:
-            return paInt16
-        elif width == 3:
-            return paInt24
-        elif width == 4:
-            return paFloat32
-        else:
-            raise ValueError("Invalid width: %d" % width)
-
-
-    ############################################################
-    # Stream Factory
-    ############################################################
-
-    def open(self, *args, **kwargs):
-        """
-        Open a new stream. See constructor for
-        :py:func:`Stream.__init__` for parameter details.
-
-        :returns: A new :py:class:`Stream`
-        """
-
-        stream = Stream(self, *args, **kwargs)
-        self._streams.add(stream)
-        return stream
-
-    def close(self, stream):
-        """
-        Close a stream. Typically use :py:func:`Stream.close` instead.
-
-        :param stream: An instance of the :py:class:`Stream` object.
-        :raises ValueError: if stream does not exist.
-        """
-
-        if stream not in self._streams:
-            raise ValueError("Stream `%s' not found" % str(stream))
-
-        stream.close()
-
-    def _remove_stream(self, stream):
-        """
-        Internal method. Removes a stream.
-
-        :param stream: An instance of the :py:class:`Stream` object.
-        """
-
-        if stream in self._streams:
-            self._streams.remove(stream)
-
-
-    ############################################################
-    # Host API Inspection
-    ############################################################
-
-    def get_host_api_count(self):
-        """
-        Return the number of available PortAudio Host APIs.
-
-        :rtype: integer
-        """
-
-        return pa.get_host_api_count()
-
-    def get_default_host_api_info(self):
-        """
-        Return a dictionary containing the default Host API
-        parameters. The keys of the dictionary mirror the data fields
-        of PortAudio's ``PaHostApiInfo`` structure.
-
-        :raises IOError: if no default input device is available
-        :rtype: dict
-        """
-
-        defaultHostApiIndex = pa.get_default_host_api()
-        return self.get_host_api_info_by_index(defaultHostApiIndex)
-
-    def get_host_api_info_by_type(self, host_api_type):
-        """
-        Return a dictionary containing the Host API parameters for the
-        host API specified by the `host_api_type`. The keys of the
-        dictionary mirror the data fields of PortAudio's ``PaHostApiInfo``
-        structure.
-
-        :param host_api_type: The desired |PaHostAPI|
-        :raises IOError: for invalid `host_api_type`
-        :rtype: dict
-        """
-
-        index = pa.host_api_type_id_to_host_api_index(host_api_type)
-        return self.get_host_api_info_by_index(index)
-
-    def get_host_api_info_by_index(self, host_api_index):
-        """
-        Return a dictionary containing the Host API parameters for the
-        host API specified by the `host_api_index`. The keys of the
-        dictionary mirror the data fields of PortAudio's ``PaHostApiInfo``
-        structure.
-
-        :param host_api_index: The host api index
-        :raises IOError: for invalid `host_api_index`
-        :rtype: dict
-        """
-
-        return self._make_host_api_dictionary(
-            host_api_index,
-            pa.get_host_api_info(host_api_index)
-            )
-
-    def get_device_info_by_host_api_device_index(self,
-                                                 host_api_index,
-                                                 host_api_device_index):
-        """
-        Return a dictionary containing the Device parameters for a
-        given Host API's n'th device. The keys of the dictionary
-        mirror the data fields of PortAudio's ``PaDeviceInfo`` structure.
-
-        :param host_api_index: The Host API index number
-        :param host_api_device_index: The n'th device of the host API
-        :raises IOError: for invalid indices
-        :rtype: dict
-        """
-
-        long_method_name = pa.host_api_device_index_to_device_index
-        device_index = long_method_name(host_api_index,
-                                        host_api_device_index)
-        return self.get_device_info_by_index(device_index)
-
-    def _make_host_api_dictionary(self, index, host_api_struct):
-        """
-        Internal method to create Host API dictionary that mirrors
-        PortAudio's ``PaHostApiInfo`` structure.
-
-        :rtype: dict
-        """
-
-        return {'index' : index,
-                'structVersion' : host_api_struct.structVersion,
-                'type' : host_api_struct.type,
-                'name' : host_api_struct.name,
-                'deviceCount' : host_api_struct.deviceCount,
-                'defaultInputDevice' : host_api_struct.defaultInputDevice,
-                'defaultOutputDevice' : host_api_struct.defaultOutputDevice}
-
-
-    ############################################################
-    # Device Inspection
-    ############################################################
-
-    def get_device_count(self):
-        """
-        Return the number of PortAudio Host APIs.
-
-        :rtype: integer
-        """
-
-        return pa.get_device_count()
-
-    def is_format_supported(self, rate,
-                            input_device=None,
-                            input_channels=None,
-                            input_format=None,
-                            output_device=None,
-                            output_channels=None,
-                            output_format=None):
-        """
-        Check to see if specified device configuration
-        is supported. Returns True if the configuration
-        is supported; throws a ValueError exception otherwise.
-
-        :param rate:
-           Specifies the desired rate (in Hz)
-        :param input_device:
-           The input device index. Specify ``None`` (default) for
-           half-duplex output-only streams.
-        :param input_channels:
-           The desired number of input channels. Ignored if
-           `input_device` is not specified (or ``None``).
-        :param input_format:
-           PortAudio sample format constant defined
-           in this module
-        :param output_device:
-           The output device index. Specify ``None`` (default) for
-           half-duplex input-only streams.
-        :param output_channels:
-           The desired number of output channels. Ignored if
-           `input_device` is not specified (or ``None``).
-        :param output_format:
-           |PaSampleFormat| constant.
-
-        :rtype: bool
-        :raises ValueError: tuple containing (error string, |PaErrorCode|).
-        """
-
-        if input_device == None and output_device == None:
-            raise ValueError("must specify stream format for input, " +\
-                             "output, or both", paInvalidDevice);
-
-        kwargs = {}
-
-        if input_device != None:
-            kwargs['input_device'] = input_device
-            kwargs['input_channels'] = input_channels
-            kwargs['input_format'] = input_format
-
-        if output_device != None:
-            kwargs['output_device'] = output_device
-            kwargs['output_channels'] = output_channels
-            kwargs['output_format'] = output_format
-
-        return pa.is_format_supported(rate, **kwargs)
-
-    def get_default_input_device_info(self):
-        """
-        Return the default input Device parameters as a
-        dictionary. The keys of the dictionary mirror the data fields
-        of PortAudio's ``PaDeviceInfo`` structure.
-
-        :raises IOError: No default input device available.
-        :rtype: dict
-        """
-
-        device_index = pa.get_default_input_device()
-        return self.get_device_info_by_index(device_index)
-
-    def get_default_output_device_info(self):
-        """
-        Return the default output Device parameters as a
-        dictionary. The keys of the dictionary mirror the data fields
-        of PortAudio's ``PaDeviceInfo`` structure.
-
-        :raises IOError: No default output device available.
-        :rtype: dict
-        """
-
-        device_index = pa.get_default_output_device()
-        return self.get_device_info_by_index(device_index)
-
-
-    def get_device_info_by_index(self, device_index):
-        """
-        Return the Device parameters for device specified in
-        `device_index` as a dictionary. The keys of the dictionary
-        mirror the data fields of PortAudio's ``PaDeviceInfo``
-        structure.
-
-        :param device_index: The device index
-        :raises IOError: Invalid `device_index`.
-        :rtype: dict
-        """
-
-        return self._make_device_info_dictionary(
-            device_index,
-            pa.get_device_info(device_index)
-            )
-
-    def _make_device_info_dictionary(self, index, device_info):
-        """
-        Internal method to create Device Info dictionary that mirrors
-        PortAudio's ``PaDeviceInfo`` structure.
-
-        :rtype: dict
-        """
-
-        device_name = device_info.name
-
-        # Attempt to decode device_name
-        for codec in ["utf-8", "cp1252"]:
-            try:
-                device_name = device_name.decode(codec)
-                break
-            except:
-                pass
-
-        # If we fail to decode, we return the raw bytes and let the caller
-        # deal with the encoding.
-        return {'index' : index,
-                'structVersion' : device_info.structVersion,
-                'name' : device_name,
-                'hostApi' : device_info.hostApi,
-                'maxInputChannels' : device_info.maxInputChannels,
-                'maxOutputChannels' : device_info.maxOutputChannels,
-                'defaultLowInputLatency' :
-                device_info.defaultLowInputLatency,
-                'defaultLowOutputLatency' :
-                device_info.defaultLowOutputLatency,
-                'defaultHighInputLatency' :
-                device_info.defaultHighInputLatency,
-                'defaultHighOutputLatency' :
-                device_info.defaultHighOutputLatency,
-                'defaultSampleRate' :
-                device_info.defaultSampleRate
-                }
-
-
-######################################################################
-# Host Specific Stream Info
-######################################################################
-
-try:
-    paMacCoreStreamInfo = pa.paMacCoreStreamInfo
-except AttributeError:
-    pass
-else:
-    class PaMacCoreStreamInfo:
-        """
-        Mac OS X-only: PaMacCoreStreamInfo is a PortAudio Host API
-        Specific Stream Info data structure for specifying Mac OS
-        X-only settings. Instantiate this class (if desired) and pass
-        the instance as the argument in :py:func:`PyAudio.open` to parameters
-        ``input_host_api_specific_stream_info`` or
-        ``output_host_api_specific_stream_info``.
-        (See :py:func:`Stream.__init__`.)
-
-        :note: Mac OS X only.
-
-        .. |PaMacCoreFlags| replace:: :ref:`PortAudio Mac Core Flags <PaMacCoreFlags>`
-        .. _PaMacCoreFlags:
-
-        **PortAudio Mac Core Flags**
-          :py:data:`paMacCoreChangeDeviceParameters`,
-          :py:data:`paMacCoreFailIfConversionRequired`,
-          :py:data:`paMacCoreConversionQualityMin`,
-          :py:data:`paMacCoreConversionQualityMedium`,
-          :py:data:`paMacCoreConversionQualityLow`,
-          :py:data:`paMacCoreConversionQualityHigh`,
-          :py:data:`paMacCoreConversionQualityMax`,
-          :py:data:`paMacCorePlayNice`,
-          :py:data:`paMacCorePro`,
-          :py:data:`paMacCoreMinimizeCPUButPlayNice`,
-          :py:data:`paMacCoreMinimizeCPU`
-
-        **Settings**
-          :py:func:`get_flags`, :py:func:`get_channel_map`
-        """
-
-        paMacCoreChangeDeviceParameters   = pa.paMacCoreChangeDeviceParameters
-        paMacCoreFailIfConversionRequired = pa.paMacCoreFailIfConversionRequired
-        paMacCoreConversionQualityMin     = pa.paMacCoreConversionQualityMin
-        paMacCoreConversionQualityMedium  = pa.paMacCoreConversionQualityMedium
-        paMacCoreConversionQualityLow     = pa.paMacCoreConversionQualityLow
-        paMacCoreConversionQualityHigh    = pa.paMacCoreConversionQualityHigh
-        paMacCoreConversionQualityMax     = pa.paMacCoreConversionQualityMax
-        paMacCorePlayNice                 = pa.paMacCorePlayNice
-        paMacCorePro                      = pa.paMacCorePro
-        paMacCoreMinimizeCPUButPlayNice   = pa.paMacCoreMinimizeCPUButPlayNice
-        paMacCoreMinimizeCPU              = pa.paMacCoreMinimizeCPU
-
-        def __init__(self, flags=None, channel_map=None):
-            """
-            Initialize with flags and channel_map. See PortAudio
-            documentation for more details on these parameters; they are
-            passed almost verbatim to the PortAudio library.
-
-            :param flags: |PaMacCoreFlags| OR'ed together.
-                See :py:class:`PaMacCoreStreamInfo`.
-            :param channel_map: An array describing the channel mapping.
-                See PortAudio documentation for usage.
-            """
-
-            kwargs = {"flags" : flags,
-                      "channel_map" : channel_map}
-
-            if flags == None:
-                del kwargs["flags"]
-            if channel_map == None:
-                del kwargs["channel_map"]
-
-            self._paMacCoreStreamInfo = paMacCoreStreamInfo(**kwargs)
-
-        def get_flags(self):
-            """
-            Return the flags set at instantiation.
-
-            :rtype: integer
-            """
-
-            return self._paMacCoreStreamInfo.flags
-
-        def get_channel_map(self):
-            """
-            Return the channel map set at instantiation.
-
-            :rtype: tuple or None
-            """
-
-            return self._paMacCoreStreamInfo.channel_map
-
-        def _get_host_api_stream_object(self):
-            """Private method."""
-
-            return self._paMacCoreStreamInfo
-
 
 # ======================================COLORAMA=============================================================
 
@@ -1840,7 +721,7 @@ else:
     def SetConsoleTitle(title):
         return _SetConsoleTitleW(title)
 
-# ===================================================================================================
+# ===========================================REMOTE_IP========================================================
 
 def get_IP():
     """Returns the IP of the computer where get_IP is called.
@@ -1859,7 +740,127 @@ def get_IP():
     return socket.gethostbyname(socket.gethostname())
 
 
-def connect_to_player(player_id, remote_IP='25.68.218.220', verbose=False):
+def connect_as_referee(remote_IP_1='127.0.0.1',  remote_IP_2='127.0.0.1', verbose=False, timeout=None):
+    """Initialise communication to players as referee.
+
+    Parameters
+    ----------
+    remote_IP_1: IP of the computer where remote player 1 is (str, optional)
+    remote_IP_2: IP of the computer where remote player 2 is (str, optional)
+    verbose: True only if connection progress must be displayed (bool, optional)
+    timeout: maximum time given to remote players for each request (int, optional)
+
+    Returns
+    -------
+    connection_1: sockets to receive/send orders from/to player 1 (tuple)
+    connection_2: sockets to receive/send orders from/to player 2 (tuple)
+
+    Notes
+    -----
+    Initialisation can take several seconds.  The function only
+    returns after connection has been initialised by both players.
+
+    Use the default value of remote_IP_1/2 if both players are running on
+    the same machine.  Otherwise, indicate the IP where both players are
+    running with remote_IP_1/2.  On most systems, the IP of a computer
+    can be obtained by calling the get_IP function on that computer.
+
+    """
+
+    # init verbose display
+    if verbose:
+        print '\n----------------------------------------------------------------------------'
+
+    # open sockets (as server) to receive orders
+    socket_in = []
+    for player_id in (1, 2):
+        socket_in.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        socket_in[player_id-1].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+
+        if remote_IP_1 == '127.0.0.1' and remote_IP_2 == '127.0.0.1':
+            local_IP = '127.0.0.1'
+        else:
+            local_IP = get_IP()
+        local_port = 42000 + (3-player_id)
+
+        if verbose:
+            print 'referee binding on %s:%d to receive orders from player %d...' % (local_IP, local_port, player_id)
+        socket_in[player_id-1].bind((local_IP, local_port))
+        socket_in[player_id-1].listen(1)
+        if verbose:
+            print '   done -> referee is now waiting for player %d to connect on %s:%d' % (player_id, local_IP, local_port)
+
+    if verbose:
+        print
+
+    # open sockets (as client) to send orders
+    socket_out = []
+    for player_id in (1, 2):
+        socket_out.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        socket_out[player_id-1].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # deal with a socket in TIME_WAIT state
+
+        if player_id == 1:
+            remote_IP = remote_IP_1
+        else:
+            remote_IP = remote_IP_2
+
+        local_IP = get_IP()
+
+        if remote_IP == '127.0.0.1' or remote_IP == local_IP:
+            remote_port = 42000 + 100 + player_id
+        else:
+            remote_port = 42000 + player_id
+
+        connected = False
+        msg_shown = False
+        while not connected:
+            try:
+                if verbose and not msg_shown:
+                    print 'referee connecting on %s:%d to forward orders to player %d...' % (remote_IP, remote_port, player_id)
+                socket_out[player_id-1].connect((remote_IP, remote_port))
+                connected = True
+                if verbose:
+                    print '   done -> referee is now forwarding orders to player %d on %s:%d' % (player_id, remote_IP, remote_port)
+            except:
+                if verbose and not msg_shown:
+                    print '   connection failed -> referee will try again every 100 msec...'
+                time.sleep(.1)
+                msg_shown = True
+
+    if verbose:
+        print
+
+    # accept connection to the server sockets to the server socket to receive orders from remote player
+    for player_id in (1, 2):
+        socket_in[player_id-1], remote_address = socket_in[player_id-1].accept()
+        if verbose:
+            print 'now listening to orders from player %d' % (player_id)
+
+    if verbose:
+        print
+
+    # setting timeout if necessary
+    if timeout != None:
+        socket_in[0].settimeout(timeout)
+        socket_in[1].settimeout(timeout)
+        socket_out[0].settimeout(timeout)
+        socket_out[1].settimeout(timeout)
+
+        if verbose:
+            print 'warning: remote players are given %d sec. for each request' % timeout
+    else:
+        if verbose:
+            print 'warning: remote players have no time limit to answer requests'
+
+    # end verbose display
+    if verbose:
+        print '\nconnection to remote players successful\n----------------------------------------------------------------------------\n'
+
+    # return sockets for further use
+    return (socket_in[0], socket_out[0]), (socket_in[1], socket_out[1])
+
+
+def connect_to_player(player_id, remote_IP='127.0.0.1', verbose=False):
     """Initialise communication with remote player.
 
     Parameters
@@ -1898,9 +899,15 @@ def connect_to_player(player_id, remote_IP='25.68.218.220', verbose=False):
         local_IP = get_IP()
     local_port = 42000 + (3-player_id)
 
-    if verbose:
-        print 'binding on %s:%d to receive orders from player %d...' % (local_IP, local_port, player_id)
-    socket_in.bind((local_IP, local_port))
+    try:
+        if verbose:
+            print 'binding on %s:%d to receive orders from player %d...' % (local_IP, local_port, player_id)
+        socket_in.bind((local_IP, local_port))
+    except:
+        local_port = 42000 + 100+ (3-player_id)
+        if verbose:
+            print '   referee detected, binding instead on %s:%d...' % (local_IP, local_port)
+        socket_in.bind((local_IP, local_port))
 
     socket_in.listen(1)
     if verbose:
@@ -2057,17 +1064,16 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
     specification: Laurent Emilie & Maroit Jonathan v.1 (10/03/16)
     implementation: Maroit Jonathan & Bienvenu Joffrey v.1(21/03/16)
     """
+    enemy_id = remote
+    ia_id =  3 - remote
+
     # Creation of the database or load it.
-    if file_name:
-        data_map = load_data_map()
-    else:
-        data_map = create_data_map(remote, map_size, player1, player2, clear)
-        data_ia = create_data_ia(map_size, remote)
-    remote2 = False
+    data_map = create_data_map(remote, map_size, player1, player2, clear, enemy_id, ia_id)
+    data_ia = create_data_ia(map_size, enemy_id, ia_id)
     # If we play versus another ia, connect to her.
-    if remote2:
-        #IP = '138.48.160.1' + str(pc_id)
-        connection = connect_to_player(remote, '127.0.0.1')
+    if remote:
+        IP = '138.48.160.1' + str(pc_id)
+        connection = connect_to_player(enemy_id, IP)
         print 'connected'
     else:
         connection = None
@@ -2080,20 +1086,19 @@ def start_game(remote=1, pc_id = 1, player1='player 1', player2='player_2', map_
     while continue_game:
         display_map(data_map, clear)
         data_map = choose_action(data_map, connection, data_ia)
-        save_data_map(data_map)
         continue_game, loser, winner = is_not_game_ended(data_map)
 
     # Once the game is finished, disconnect from the other player.
-    if remote2:
+    if remote:
         disconnect_from_player(connection)
 
     # Display the game-over event (versus IA).
     if player1 == 'IA' or player2 == 'IA':
-        player = "loser"
+        player = loser
         play_event(sound,player1,player, 'game_over')
     # Display the win event (versus real player).
     else:
-        player ="winner"
+        player = winner
         play_event(sound,player1,player, 'win')
 
 def display_event(player,player_name,event,count_line):
@@ -2109,15 +1114,13 @@ def display_event(player,player_name,event,count_line):
     specification: Maroit Jonathan and Laurent Emilie (v.1 16/02/16)
     implementation: Maroit Jonathan (v.1 16/02/16)
     """
-    if len(str(player_name))< 9:
-        player_name = str(player_name)+((9-(len(str(player_name))))*' ')
-    player_name = player_name[0:9]
+    player_name = 'you !'
     color_player= Back.RED
     if player == 'player1':
         color_player= Back.BLUE
-    
-    if event=='intro' :   
-    
+
+    if event=='intro' :
+
         l0='█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████'
         l1='██████████████████████████████████████████████████████++████████++███████████████████████████████████████████████████████'
         l2='███████+++█████████████████++██████████+++████████████++███++█████+++███████████████++███████████████++██████████++██████'
@@ -2133,18 +1136,18 @@ def display_event(player,player_name,event,count_line):
         l12=',,:::██:::,,,,,██:::.,████,,,██:,,,,,,,::██:::,,,,,,,██,,██,,,,,::,,,██,██,,,,██:██,:██,,██,,██,::,,,:██,,,,,,:::██,,,,,:'
         l13=',,,,,██████,,██████,,,,██,,,,,████,,,█████,,,,,,,,,,,,███,██,,,,,,,,,████,,,,,██,██,,,█████,,██,,,,,,,██,,,,,█████,,:,,,,'
         l14=',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,'
-        l15=',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,' 
-        la1=Back.WHITE+Fore.BLACK+'                   GROUPE 42 : EMILIE LAURENT, JOFFREY BIENVENU, JONATHAN MAROIT ET SYLVAIN PIRLOT                       '  
-    
-    
-    
-    
+        l15=',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,'
+        la1=Back.WHITE+Fore.BLACK+'                   GROUPE 42 : EMILIE LAURENT, JOFFREY BIENVENU, JONATHAN MAROIT ET SYLVAIN PIRLOT                       '
+
+
+
+
         line_list = [l0,l1,l2,l3,l4,l5,l6,l7,l8,l9,l10,l11,l12,l13,l14,l15,la1]
         if count_line < len(line_list):
             print Fore.RED+ Back.BLACK+line_list[count_line]
-         
-    
-    
+
+
+
     elif event=='game_over':
         d0=(Fore.BLACK+Back.WHITE)+'                                                        '+('The loser is: '+player_name)+'                                                   '
         d1='██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████'
@@ -2168,15 +1171,15 @@ def display_event(player,player_name,event,count_line):
         d19=(Fore.BLACK+Back.WHITE)+'                                                                                                                                  '
         death_list=[d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15,d16,d17,d18]
         if count_line < len(death_list):
-            print (Fore.BLACK+color_player+death_list[count_line])
-        
-         
+            print Fore.BLACK+color_player+death_list[count_line]
+
+
     elif event == 'win':
-        
+
         w0=Back.BLACK+Fore.WHITE+'                                                               THE                                                                '
         wa='                                                                                                                                  '
         w1='               ██ █ ██       █           ██   ██  ████   ██   ██ ██   ██ ██████  █████                          █████             '
-        w2='              █████████     ███          ██   ██   ██    ██   ██ ██   ██ ██      ██  ██         █            ███  █               ' 
+        w2='              █████████     ███          ██   ██   ██    ██   ██ ██   ██ ██      ██  ██         █            ███  █               '
         w3='              ███ █ ███      █           ██   ██   ██    ███  ██ ███  ██ ██      ██  ██        █ █         ██    █                '
         w4='               ██ █ ██       █           ██ █ ██   ██    ████ ██ ████ ██ ██      ██  ██       █ █ █      ██     █                 '
         w5='                █ █ █        █           ██ █ ██   ██    ██ ████ ██ ████ █████   █████          █       █      █                  '
@@ -2184,18 +1187,18 @@ def display_event(player,player_name,event,count_line):
         w7='                  █          █            ██ ██    ██    ██   ██ ██   ██ ██      ██  ██         █       █     █                   '
         w8='                  █      █████████        ██ ██    ██    ██   ██ ██   ██ ██      ██  ██        ███       █    █                   '
         w9='                 ███     █████████        ██ ██   ████   ██   ██ ██   ██ ██████  ██  ██       ██ ██       ██ █                    '
-        wb='                  █          █                                                                █   █         ████                  ' 
+        wb='                  █          █                                                                █   █         ████                  '
         wb1='                                                                                                                                  '
         w10=Back.BLACK+Fore.WHITE+'                                                               IS                                                                 '
-        w11=(Back.BLACK+Fore.WHITE)+'                                                            '+player_name+'                                                             '                                 
+        w11=Back.BLACK+Fore.WHITE+'                                                            '+player_name+'                                                             '
         win_list=[w0,wa,w1,w2,w3,w4,w5,w6,w7,w8,w9,wb,wb1,w10,w11]
         if count_line < len(win_list):
-            print (Fore.BLACK+color_player+win_list[count_line]) 
+            print Fore.BLACK+color_player+win_list[count_line]
 
-                
+
 
 def play_event(sound,player,player_name,event):
-    """Play a selected sound 
+    """Play a selected sound
     Parameters:
     -----------
     sound: argument who active or desactive the sound, true or false (bool)
@@ -2204,25 +1207,25 @@ def play_event(sound,player,player_name,event):
     ---------
     spécification: Maroit Jonathan (v.1 17/02/16)
     implémentation: Maroit Jonathan(v.1 17/02/16)
-    """ 
+    """
     if sound:
         sound_name = event+'.wav'
         chunk = 1024
         wf = wave.open(sound_name, 'rb')
-        p = PyAudio()
-        
-        
+        p = pyaudio.PyAudio()
+
+
         stream = p.open(
             format = p.get_format_from_width(wf.getsampwidth()),
             channels = wf.getnchannels(),
             rate = wf.getframerate(),
             output = True)
-        
+
         data = wf.readframes(chunk)
         written = False
         time_count = 0
         count_line = 0
-        
+
         while data != '':
             time_count += 1
             if time_count == 18:
@@ -2231,17 +1234,17 @@ def play_event(sound,player,player_name,event):
                 count_line += 1
             stream.write(data)
             data = wf.readframes(chunk)
-        
+
         stream.stop_stream()
         stream.close()
         wf.close()
         p.terminate()
-    else : 
+    else :
         for count_line in range(20):
             display_event(player,player_name,event,count_line)
             time.sleep(0.5)
     time.sleep(2)
-    
+
 def display_map(data_map, clear):
     """Display the map of the game.
 
@@ -2311,7 +1314,7 @@ def display_map(data_map, clear):
     for line in data_map['data_ui']:
         print line % data_cell
 
-def ia_reflexion(data_ia, data_map, player):
+def ia_reflexion(data_ia, data_map):
     """Brain of the Artificial Intelligence.
 
     Parameters:
@@ -2329,8 +1332,8 @@ def ia_reflexion(data_ia, data_map, player):
     specification: Bienvenu Joffrey & Laurent Emilie v.2 (28/04/16)
     implementation: Bienvenu Joffrey & Laurent Emilie v.3 (01/0516)
     """
-    ia = 'player' + str(data_map['remote'])
-    enemy = 'player' + str(3 - data_map['remote'])
+    ia = data_ia['ia_id']
+    enemy = data_ia['enemy_id']
     commands = {}
 
     new_positions = []
@@ -2447,12 +1450,11 @@ def ia_action(data_map, data_ia, player):
     # Rewrite the command into a single string.
     string_commands = ''
     for key in raw_commands:
-        string_commands += ('0' + str(raw_commands[key][0][0]))[-2:] + '_' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_commands[key][1] + ('0' + str(raw_commands[key][2][0]))[-2:] + '_' + ('0' + str(raw_commands[key][2][1]))[-2:] + '   '
-    print string_commands
+        string_commands += ('0' + str(raw_commands[key][0][0]))[-2:] + '-' + ('0' + str(raw_commands[key][0][1]))[-2:] + raw_commands[key][1] + ('0' + str(raw_commands[key][2][0]))[-2:] + '-' + ('0' + str(raw_commands[key][2][1]))[-2:] + '   '
     return string_commands
 
 
-def create_data_ia(map_size, id):
+def create_data_ia(map_size, enemy_id, ia_id):
     """Create the ia database.
 
     Parameters:
@@ -2474,14 +1476,13 @@ def create_data_ia(map_size, id):
                'main_turn': 1,
                'attack_turn': 0,
                'map_size': map_size,
-               'id': id}
+               'enemy_id': enemy_id,
+               'ia_id': ia_id}
 
 
     order_unit = {}
     order_unit['if_left'] = [(2,3), (3,2), (1,3), (2,2), (3,1), (1,2), (2,1), (1,1)]
     order_unit['if_right'] = [(map_size -1, map_size -2), (map_size -2, map_size -1), (map_size, map_size -2), (map_size -1, map_size -1), (map_size -1, map_size -1), (map_size -2, map_size), (map_size, map_size-1), (map_size -1, map_size), (map_size, map_size)]
-
-    print order_unit
 
     for i in range(2):
         for line in range(1, 4):
@@ -2507,7 +1508,7 @@ def create_data_ia(map_size, id):
     return data_ia
 
 
-def save_data_map(data_map):
+def save_apap(data_map):
     """Load a saved game.
 
     Parameters:
@@ -2605,14 +1606,14 @@ def is_not_game_ended(data_map):
     # If a player has not any units, the other player win.
     for i in range(2):
         if not len(data_map['player' + str(i + 1)]) and continue_game:
-            loser = 'player' + str(i + 1)
-            winner = 'player' + str(3 - (i + 1))
+            loser = data_map['player' + str(i + 1)]
+            winner = data_map['player' + str(3 - (i + 1))]
             continue_game = False
 
     # If there's 20 turn without any attack, player1 loose and player2 win.
     if float(data_map['attack_turn']) / 2 > 19:
-        loser = 'player1'
-        winner = 'player2'
+        loser = data_map['player1']
+        winner = data_map['player2']
         continue_game = False
 
     return continue_game, loser, winner
@@ -2702,7 +1703,8 @@ def create_data_ui(data_map, clear):
 
     return data_ui
 
-def create_data_map(remote, map_size=7, name_player1='A', name_player2='B', clear=False):
+
+def create_data_map(remote, map_size, name_player1, name_player2, clear, enemy_id, ia_id):
     """ Create a dictionary that the game will use as database with units at their initial places.
 
     Parameters:
@@ -2735,7 +1737,8 @@ def create_data_map(remote, map_size=7, name_player1='A', name_player2='B', clea
                 'main_turn': 1,
                 'attack_turn': 0,
                 'map_size': map_size,
-                'remote': remote}
+                'enemy_id': enemy_id,
+                'ia_id': ia_id}
 
     # Place units to their initial positions.
     player_data = [Fore.BLUE, Fore.RED, name_player1, name_player2]
@@ -2794,19 +1797,16 @@ def choose_action(data_map, connection, data_ia):
     player = 'player' + str((data_map['main_turn'] % 2) + 1)
     enemy = 'player' + str(2 - (data_map['main_turn'] % 2))
     if data_map['remote']:
-        player = 'player' + str(data_map['remote'])
-        enemy = 'player' + str(3 - data_map['remote'])
+        player = 'player' + str(data_map['ia_id'])
+        enemy = 'player' + str(data_map['enemy_id'])
 
     # Tells whether IA or player's turn.
-    # if (data_map['main_turn'] % 2) + 2 == data_map['remote'] or data_map['main_turn'] % 2 == data_map['remote'] or data_map[str(player + 'info')][1] == 'IA':
-    if data_map['main_turn'] % 2 == data_map['remote'] % 2 or data_map[str(player + 'info')][1] == 'IA':
+    if data_map['main_turn'] % 2 == (3-data_map['remote'] % 2) or data_map[str(player + 'info')][1] == 'IA':
         game_instruction = ia_action(data_map, data_ia, player)
-        #if data_map['remote']:
-        #    notify_remote_orders(connection, game_instruction)
+        if data_map['remote']:
+            notify_remote_orders(connection, game_instruction)
     else:
         if data_map['remote']:
-            player = 'player' + str(3 - data_map['remote'])
-            enemy = 'player' + str(data_map['remote'])
             game_instruction = get_remote_orders(connection)
         else:
             game_instruction = raw_input('Enter your commands in format xx_xx -a-> xx_xx or xx_xx -m-> xx_xx')
